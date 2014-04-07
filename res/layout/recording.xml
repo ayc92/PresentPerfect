@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+    
+    <FrameLayout
+        android:id="@+id/top_margin"
+        android:layout_alignParentTop="true"
+        android:layout_centerVertical="true"
+        android:layout_width="fill_parent"
+        android:layout_height="100dp" >
+    </FrameLayout>
+    
+    <FrameLayout
+        android:id="@+id/buttons_container"
+        android:layout_below="@id/top_margin"
+        android:layout_height="wrap_content"
+        android:layout_width="fill_parent"
+        android:layout_gravity="center_vertical|center_horizontal"
+        android:foregroundGravity="center"
+        android:background="@android:color/darker_gray"
+        android:layout_marginBottom="40dp"
+        android:orientation="horizontal" >
+        <ImageButton
+            android:id="@+id/pause_record"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical|center_horizontal"
+            android:src="@drawable/ic_action_pause"
+            android:background="@android:color/darker_gray"
+            android:onClick="onRecordPressed" />
+        <ImageButton
+            android:id="@+id/begin_record"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical|center_horizontal"
+            android:src="@drawable/ic_action_mic"
+            android:background="@android:color/darker_gray"
+            android:onClick="onRecordPressed" />
+    </FrameLayout>
+    
+    <TextView
+        android:id="@+id/time_display"
+        android:layout_below="@id/buttons_container"
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:text="@string/init_time"
+        android:textSize="60sp" />
+
+</RelativeLayout>
