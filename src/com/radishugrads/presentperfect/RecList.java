@@ -1,6 +1,8 @@
 package com.radishugrads.presentperfect;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
@@ -134,14 +136,16 @@ public class RecList extends Activity {
 	}
 	
 	public void addGroup(String name, boolean isGroup, int which){ //Which refers to id of group or id of child
+		SimpleDateFormat s = new SimpleDateFormat("MM-dd-yyyy");
+		String timeStamp = s.format(new Date()); // Find todays date
 		boolean empty = false;
 		if (!(isGroup) && (which != ADDGROUP)) {
 			empty = (listAdapter.getChildrenCount(which)-1 == 0);
 			}
 		if (!(isGroup)) {
-			listDataChild.get(listDataHeader.get(which)).add(newest_input);
+			listDataChild.get(listDataHeader.get(which)).add(newest_input + " - " + timeStamp);
 		} else if (!(empty) && !(isGroup)) {
-			listDataChild.get(listDataHeader.get(which)).add(newest_input);
+			listDataChild.get(listDataHeader.get(which)).add(newest_input + " - " + timeStamp);
 		} else if (isGroup) {
 			int size = listAdapter.getGroupCount();
 			listDataHeader.add(name);
@@ -149,6 +153,7 @@ public class RecList extends Activity {
 			new_group.add(ADD_BUTTON);
 			listDataChild.put(listDataHeader.get(size), new_group);
 		}
+		listAdapter.notifyDataSetChanged();
 	}
 	
 	
