@@ -113,6 +113,8 @@ public class RecorderActivity extends Activity {
 						
 						//after one start/stop record cycle, disable animation and recording capability
 						animEnabled = false;
+						
+						// TODO: start feedback activity
 					}
 				}
 				break;
