@@ -28,6 +28,14 @@
             android:name="com.radishugrads.presentperfect.RecorderActivity"
             android:label="@string/recorder_activity" >
         </activity>
+        <activity
+            android:name="com.radishugrads.presentperfect.OptionsActivity"
+            android:label="@string/title_activity_options" >
+        </activity>
+        <activity
+            android:name="com.radishugrads.presentperfect.Info"
+            android:label="@string/title_activity_info" >
+        </activity>
     </application>
 
 </manifest>

@@ -1,0 +1,100 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+	android:orientation="vertical"
+    tools:context=".OptionsActivity" >
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="35sp"
+        android:layout_marginTop="20dp"
+        android:layout_marginLeft="5dp"
+        android:fontFamily="sans-serif-black"
+        android:textStyle="bold"
+        android:text="Timing Mode" />
+    
+    <LinearLayout
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center_horizontal"
+	android:orientation="horizontal">
+        <LinearLayout
+    android:layout_width="0dp"
+    android:layout_weight="1"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="10dp"
+	android:orientation="vertical">
+            
+        <RadioGroup
+        android:id="@+id/timingOp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" >
+ 
+        <RadioButton
+            android:id="@+id/radioTimer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="20sp"
+            android:text="Timer" 
+            android:checked="true" />
+ 
+        <RadioButton
+            android:id="@+id/radioStopwatch"
+            android:textSize="20sp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Stopwatch" />
+ 
+    </RadioGroup>
+    </LinearLayout>
+
+	<EditText
+        android:id="@+id/editText1"
+        android:layout_width="100dp"
+        android:layout_height="wrap_content"
+        android:onClick="showTimeDialog"
+        android:layout_weight="1"
+        android:editable="false"
+        android:textSize="20sp"
+        android:gravity="center_horizontal"
+        android:layout_marginRight="15dp"
+        android:layout_marginLeft="25dp"
+		android:text="Set time">
+        <requestFocus />
+        </EditText>
+
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+	android:orientation="horizontal"
+	android:gravity="center_vertical"
+	android:layout_marginTop="30dp"
+        >
+        <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="35sp"
+        android:fontFamily="sans-serif-black"
+        android:textStyle="bold"
+        android:layout_marginLeft="5dp"
+        android:text="Buzzwords" />
+        
+
+        <ImageButton
+            android:id="@+id/wordslist"
+            android:layout_width="45dp"
+        	android:layout_height="45dp"
+        	android:background="@android:color/transparent"
+        	android:layout_marginLeft="5dp"
+    		android:src="@drawable/ic_action_black"/>
+        </LinearLayout>
+		<ListView
+    	android:id="@android:id/list"
+    	android:layout_width="wrap_content" 
+    	android:layout_height="wrap_content"
+    	android:drawSelectorOnTop="false"
+    />
+</LinearLayout>
