@@ -3,9 +3,11 @@ package com.radishugrads.presentperfect;
 import java.util.HashMap;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.Animation.AnimationListener;
@@ -87,6 +89,19 @@ public class RecorderActivity extends Activity {
 		return true;
 	}
 	
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+	    // Handle presses on the action bar items
+	    switch (item.getItemId()) {
+	        case R.id.action_settings:
+	        	Intent recordIntent = new Intent(this, OptionsActivity.class);
+	    		startActivity(recordIntent);
+	            return true;
+	        default:
+	            return super.onOptionsItemSelected(item);
+	    }
+	}
+	
 	private void slideButtons() {
 		recordButton.startAnimation(slideLeft);
 		pauseButton.startAnimation(slideRight);
@@ -113,6 +128,8 @@ public class RecorderActivity extends Activity {
 						
 						//after one start/stop record cycle, disable animation and recording capability
 						animEnabled = false;
+						Intent recordIntent = new Intent(this, Info.class);
+						startActivity(recordIntent);
 					}
 				}
 				break;

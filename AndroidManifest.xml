@@ -26,15 +26,15 @@
         </activity>
         <activity
             android:name="com.radishugrads.presentperfect.RecorderActivity"
-            android:label="@string/recorder_activity" >
+            android:label="Recorder" >
         </activity>
         <activity
             android:name="com.radishugrads.presentperfect.OptionsActivity"
-            android:label="@string/title_activity_options" >
+            android:label="Options" >
         </activity>
         <activity
             android:name="com.radishugrads.presentperfect.Info"
-            android:label="@string/title_activity_info" >
+            android:label="Info" >
         </activity>
     </application>
 
