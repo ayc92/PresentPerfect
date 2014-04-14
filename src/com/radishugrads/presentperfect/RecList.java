@@ -297,7 +297,7 @@ public class RecList extends Activity {
 			return;
 		}
 		Toast.makeText(getApplicationContext(), 
-				"Press the delete button again to disable remove mode.",
+				"Press the delete button again to disable delete mode.",
 				   Toast.LENGTH_LONG).show();
 		if (!removeButtonPushed) { //Remove Mode Activated
 			listAdapter.setRemoveChild(true);
@@ -313,7 +313,7 @@ public class RecList extends Activity {
 	
 	private void startRemoveParent() {
 		Toast.makeText(getApplicationContext(), 
-				"Press the delete button again to disable remove mode.",
+				"Press the delete button again to disable delete mode.",
 				   Toast.LENGTH_LONG).show();
 		if (!removeButtonPushed) { //Remove Mode Activated
 			if (isExpanded) {
