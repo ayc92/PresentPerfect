@@ -99,7 +99,6 @@ public class RecList extends Activity {
 		 
 		    @Override
 		    public void onGroupCollapse(int groupPosition) {
-		    	System.out.println("onCollapse - removeButtonPushed: " + removeButtonPushed);
 		    	if (removeButtonPushed) {
 		    		removeButtonPushed = false;
 		    		listAdapter.setRemoveChild(false);
