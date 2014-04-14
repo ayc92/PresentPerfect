@@ -11,5 +11,10 @@
     <string name="hello_world">Hello world!</string>
     <string name="create">Create!</string>
     <string name="cancel">Cancel</string>
+    <string name="delete">Delete</string>
+    <string-array name="removeOptions">
+        <item>Projects</item>
+        <item>Recordings</item>
+    </string-array>
 
 </resources>
