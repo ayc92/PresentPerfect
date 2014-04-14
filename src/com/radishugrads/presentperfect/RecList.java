@@ -296,6 +296,9 @@ public class RecList extends Activity {
 					   Toast.LENGTH_LONG).show();
 			return;
 		}
+		Toast.makeText(getApplicationContext(), 
+				"Press the delete button again to disable remove mode.",
+				   Toast.LENGTH_LONG).show();
 		if (!removeButtonPushed) { //Remove Mode Activated
 			listAdapter.setRemoveChild(true);
 			removeButtonPushed = true;
@@ -309,6 +312,9 @@ public class RecList extends Activity {
 	}
 	
 	private void startRemoveParent() {
+		Toast.makeText(getApplicationContext(), 
+				"Press the delete button again to disable remove mode.",
+				   Toast.LENGTH_LONG).show();
 		if (!removeButtonPushed) { //Remove Mode Activated
 			if (isExpanded) {
 				expListView.collapseGroup(lastExpanded);
@@ -327,6 +333,16 @@ public class RecList extends Activity {
 	}
 	
 	public void startRemove(View v) {
+		if (deleteGroup || removeButtonPushed) {
+			listAdapter.setRemoveParent(false);
+			listAdapter.setRemoveChild(false);
+			removeButtonPushed = false;
+			deleteGroup = false;
+			listAdapter.changedLayout(true);
+			listAdapter.notifyDataSetChanged();
+			listAdapter.notifyDataSetInvalidated();
+			return;
+		}
 		AlertDialog.Builder alert = createOptionDialog();
 		alert.show();
 	}
