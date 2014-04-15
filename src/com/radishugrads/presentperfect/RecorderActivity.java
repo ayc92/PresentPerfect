@@ -1,5 +1,7 @@
 package com.radishugrads.presentperfect;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 
 import android.app.Activity;
@@ -8,10 +10,12 @@ import android.media.AudioFormat;
 import android.media.AudioManager;
 import android.media.AudioRecord;
 import android.media.AudioTrack;
+import android.media.MediaPlayer;
 import android.media.MediaRecorder;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -53,6 +57,11 @@ public class RecorderActivity extends Activity {
 	int bufReadResult;
 	AudioTrack audioTrack;
 	RecordTask recordTask;
+	
+	File mFile = null;
+	String filePath = null;
+	private MediaRecorder mRecorder = null;
+    private MediaPlayer   mPlayer = null;
 	
 	// data variables
 	HashMap<String, Integer> wordCounts;
@@ -114,6 +123,9 @@ public class RecorderActivity extends Activity {
         		AudioFormat.ENCODING_PCM_16BIT,
         		bufferSize,
         		AudioTrack.MODE_STATIC);
+		
+		mFile = new File(getFilesDir(), "audiotest.3gp");
+		filePath = mFile.getAbsolutePath();
 	}
 
 	@Override
@@ -150,7 +162,14 @@ public class RecorderActivity extends Activity {
 					System.out.println("in here");
 					recordButton.setImageResource(R.drawable.ic_action_mic);
 					handler.removeCallbacks(updateTime);
+					
+					mRecorder.stop();
+			    	mRecorder.reset();
+			        mRecorder.release();
+			        mRecorder = null;
+			        
 					Intent recordIntent = new Intent(this, Info.class);
+					recordIntent.putExtra("recordPath", filePath);
 					startActivity(recordIntent);
 				} else {
 					System.out.println("in here 2");
@@ -163,8 +182,22 @@ public class RecorderActivity extends Activity {
 					handler.postDelayed(updateTime, 0);
 					
 					// TODO: speech recognition
-					recorder.startRecording();
+//					recorder.startRecording();
 					runNewRecordTask();
+					
+					mRecorder = new MediaRecorder();
+			        mRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
+			        mRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
+			        mRecorder.setOutputFile(filePath);
+			        mRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
+
+			        try {
+			            mRecorder.prepare();
+			        } catch (IOException e) {
+			            Log.e("", "prepare() failed");
+			        }
+
+			        mRecorder.start();
 				}
 				isRecording = !isRecording;
 				break;
@@ -172,7 +205,9 @@ public class RecorderActivity extends Activity {
 				if (isRecording) {
 					pauseButton.setImageResource(R.drawable.ic_action_play);
 					handler.removeCallbacks(updateTime);
+					mRecorder.stop();
 				} else {
+					mRecorder.start();
 					pauseButton.setImageResource(R.drawable.ic_action_pause);
 					handler.postDelayed(updateTime, 0);
 					runNewRecordTask();

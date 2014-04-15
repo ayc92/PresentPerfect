@@ -20,6 +20,7 @@
         	android:layout_height="45dp"
         	android:layout_gravity="center_horizontal"
         	android:background="#606060"
+        	android:onClick="playback"
     		android:src="@drawable/ic_action_play"/>
 <TextView
         android:layout_width="match_parent"
@@ -34,7 +35,9 @@
         android:textStyle="bold"
         android:layout_gravity="center_horizontal"
         android:gravity="center_horizontal"
-        android:text="Speech time 00:34" />
+        android:text="Speech time: 00:00" 
+        android:id="@+id/speechTime"
+        />
 <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
