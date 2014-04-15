@@ -5,17 +5,22 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ExpandableListView;
 import android.widget.ExpandableListView.OnChildClickListener;
+import android.widget.ExpandableListView.OnGroupCollapseListener;
 import android.widget.ExpandableListView.OnGroupExpandListener;
+import android.widget.Toast;
 
 
 /*
@@ -28,17 +33,24 @@ public class RecList extends Activity {
     ExpandableListView expListView;
     List<String> listDataHeader;
     HashMap<String, List<String>> listDataChild;
-    private AlertDialog.Builder alert;
     private final int NONE_EXPANDED = -1;
     private int lastExpanded = NONE_EXPANDED;
-    private final String ADD_BUTTON = "[  Add New Recording  ]";
+    public final static String ADD_BUTTON = "[  Add New Recording  ]";
     private final int ADD_CHILD = 0;
     private String newest_input = "";
-    private boolean isTyping = false;
     private boolean changed = false;
     private boolean isGroup = false;
+    private boolean removeButtonPushed = false; //Remove Mode Activated?
     private int lastId = -1;
     private final int ADDGROUP = -10;
+    private final Context context = this;
+    private boolean isExpanded = false;
+    private int currExpanded = -1;
+    private boolean deleteGroup;
+    private int[] removeInfo = new int[2]; //index 0 is groupPosition, index 1 is childPosition 
+    private boolean[] removeWhich = new boolean[2]; //index 0 is for (removeProjects?), index 1 is for (removeRecordings?) 
+    private boolean changeback = false; //Delete and remove if statements when done
+    
 	
     @Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -47,9 +59,8 @@ public class RecList extends Activity {
 		 // get the listview
         expListView = (ExpandableListView) findViewById(R.id.lvExp);
         prepareList();
-        listAdapter = new ExpandableListAdapter(this, listDataHeader, listDataChild);
+        listAdapter = new ExpandableListAdapter(context, listDataHeader, listDataChild);
         expListView.setAdapter(listAdapter);
-        alert = new AlertDialog.Builder(this);
         setUp();
 	}
 	
@@ -63,8 +74,18 @@ public class RecList extends Activity {
 	private void setUp() {
 		expListView.setOnGroupExpandListener(new OnGroupExpandListener() {
 			
+			//On group expand
 			@Override
 			public void onGroupExpand(int groupPosition) {
+				if (deleteGroup) {
+					expListView.collapseGroup(groupPosition);
+					removeInfo[0] = groupPosition;
+					AlertDialog.Builder alert = createParentDeleteDialog(groupPosition);
+					alert.show();
+					return;
+				}
+				currExpanded = groupPosition;
+				isExpanded = true;
 				if (lastExpanded != NONE_EXPANDED &&
 						groupPosition != lastExpanded) {
 					expListView.collapseGroup(lastExpanded);
@@ -73,27 +94,136 @@ public class RecList extends Activity {
 			}
 		});
 		
-		 expListView.setOnChildClickListener(new OnChildClickListener() {
+		// Listview Group expanded listener
+		expListView.setOnGroupCollapseListener(new OnGroupCollapseListener() {
+		 
+		    @Override
+		    public void onGroupCollapse(int groupPosition) {
+		    	if (removeButtonPushed) {
+		    		removeButtonPushed = false;
+		    		listAdapter.setRemoveChild(false);
+		    		listAdapter.changedLayout(true);
+		    		listAdapter.notifyDataSetChanged();
+		    		listAdapter.notifyDataSetInvalidated();
+		    	} else {
+		    		listAdapter.changedLayout(false);
+		    	}
+			    	if (currExpanded == groupPosition) {
+			    		isExpanded = false;
+			    	}
+
+		    }
+		});
+		
+		
+		
+		//On child click
+		expListView.setOnChildClickListener(new OnChildClickListener() {
 			 
 	            @Override
 	            public boolean onChildClick(ExpandableListView parent, View v,
 	                    int groupPosition, int childPosition, long id) {
-	            	if (childPosition == ADD_CHILD) {
+	            	if (removeButtonPushed && childPosition != ADD_CHILD) {
+	            		removeInfo[0] = groupPosition;
+	            		removeInfo[1] = childPosition;
+	            		AlertDialog.Builder alert = createChildDeleteDialog(groupPosition, childPosition);
+	            		alert.show();
+	            	} else if (childPosition == ADD_CHILD) {
 	            		add(v, "child", groupPosition);
 	            	} else {
-	            		//GO TO THE INFO SCREEN FOR THAT RECORDING
+	            		if (changeback) {
+	            			Intent i = new Intent(context, RecorderActivity.class);
+	            			startActivity(i);
+	            		}
 	            	}
 	                return false;
 	            }
 	        });
 	}
+	
+	private AlertDialog.Builder createParentDeleteDialog(int groupPos) {
+		String parentName = listDataHeader.get(groupPos);
+		AlertDialog.Builder alert = new AlertDialog.Builder(context);
+		alert.setTitle("Delete Project?");
+		alert.setMessage("Delete project: " + parentName + "?");
+		alert.setPositiveButton(R.string.delete, new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int whichButton) {
+				removeParent(removeInfo[0]);
+			}
+		});
+		
+		alert.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int whichButton) {
+			}
+			});
+		return alert;
+	}
+	
+	private AlertDialog.Builder createChildDeleteDialog(int groupPos, int childPos) {
+		String childName = listDataChild.get(listDataHeader.get(groupPos)).get(childPos);
+		AlertDialog.Builder alert = new AlertDialog.Builder(context);
+		alert.setTitle("Delete recording?");
+		alert.setMessage("Delete recording: " + childName + "?");
+		alert.setPositiveButton(R.string.delete, new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int whichButton) {
+				removeChild();
+			}
+		});
+		
+		alert.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int whichButton) {
+			}
+			});
+		return alert;
+	}
+	
+	private AlertDialog.Builder createOptionDialog() {
+		AlertDialog.Builder alert = new AlertDialog.Builder(context);
+		alert.setTitle("Choose which to delete!")
+			.setItems(R.array.removeOptions, new DialogInterface.OnClickListener() {
+	               
+				/*
+				 * Which: 0 for removing projects, 1 for removing recordings.
+				 * @see android.content.DialogInterface.OnClickListener#onClick(android.content.DialogInterface, int)
+				 */
+				public void onClick(DialogInterface dialog, int which) {
+	            	   for (int i=0; i < 2; i++) {
+	            		   if (i == which) {
+	            			   removeWhich[i] = true;
+	            		   } else {
+	            			   removeWhich[i] = false;
+	            		   }
+	            	   }
+	            	   removeHelper();
+	               }
+			});
+		return alert;
+	}
+	
+	private void removeChild() {
+		listDataChild.get(listDataHeader.get(removeInfo[0])).remove(removeInfo[1]);
+		listAdapter.notifyDataSetChanged();
+		listAdapter.notifyDataSetInvalidated();
+	}
+	
+	private void removeParent(int groupPosition) {
+		listDataHeader.remove(groupPosition);
+		//Deactivate Remove Mode
+		listAdapter.setRemoveParent(false);
+		listAdapter.setRemoveChild(false);
+		removeButtonPushed = false;
+		deleteGroup = false;
+		listAdapter.changedLayout(true);
+		listAdapter.notifyDataSetChanged();
+		listAdapter.notifyDataSetInvalidated();
+	}
+	
 	public void addClick(View v) {
 		add(v, "group", -10);
 	}
 	
 	public void add(View v, String group_or_child, int id) {
 		lastId = id;
-		isTyping = true;
 		changed = false;
 		if (group_or_child == "group") {
 			isGroup = true;
@@ -104,9 +234,10 @@ public class RecList extends Activity {
 		if (!(isGroup)) {
 			other = "new recording";
 		}
-		alert.setTitle(other.toUpperCase());
+        AlertDialog.Builder alert = new AlertDialog.Builder(context);
+		alert.setTitle(other.toUpperCase(Locale.US));
 		alert.setMessage("Input name of "+ other + ".");
-		final EditText input = new EditText(this);
+		final EditText input = new EditText(context);
 		alert.setView(input);
 		alert.setPositiveButton(R.string.create, new DialogInterface.OnClickListener() {
 			public void onClick(DialogInterface dialog, int whichButton) {
@@ -118,12 +249,10 @@ public class RecList extends Activity {
 				update_list();
 				}
 			});
-		
 		alert.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-			  public void onClick(DialogInterface dialog, int whichButton) {
-			    // Canceled.
-				  changed = false;
-			  }
+			public void onClick(DialogInterface dialog, int whichButton) {
+				changed = false;
+			}
 			});
 
 		alert.show();
@@ -154,6 +283,76 @@ public class RecList extends Activity {
 			listDataChild.put(listDataHeader.get(size), new_group);
 		}
 		listAdapter.notifyDataSetChanged();
+		if (changeback) {
+			Intent i = new Intent(context, RecorderActivity.class);
+			startActivity(i);
+		}
+	}
+
+	private void startRemoveChild() {
+		if (!isExpanded) {
+			Toast.makeText(getApplicationContext(), 
+					"A project must be chosen to be able to delete recordings.",
+					   Toast.LENGTH_LONG).show();
+			return;
+		}
+		Toast.makeText(getApplicationContext(), 
+				"Press the delete button again to disable delete mode.",
+				   Toast.LENGTH_LONG).show();
+		if (!removeButtonPushed) { //Remove Mode Activated
+			listAdapter.setRemoveChild(true);
+			removeButtonPushed = true;
+		} else { //Remove Mode Deactivated
+			listAdapter.setRemoveChild(false);
+			removeButtonPushed = false;
+		}
+		listAdapter.changedLayout(true);
+		listAdapter.notifyDataSetChanged();
+		listAdapter.notifyDataSetInvalidated();
+	}
+	
+	private void startRemoveParent() {
+		Toast.makeText(getApplicationContext(), 
+				"Press the delete button again to disable delete mode.",
+				   Toast.LENGTH_LONG).show();
+		if (!removeButtonPushed) { //Remove Mode Activated
+			if (isExpanded) {
+				expListView.collapseGroup(lastExpanded);
+			}
+			listAdapter.setRemoveParent(true);
+			removeButtonPushed = true;
+			deleteGroup = true;
+		} else { //Remove Mode Deactivated
+			listAdapter.setRemoveParent(false);
+			removeButtonPushed = false;
+			deleteGroup = false;
+		}
+		listAdapter.changedLayout(true);
+		listAdapter.notifyDataSetChanged();
+		listAdapter.notifyDataSetInvalidated();
+	}
+	
+	public void startRemove(View v) {
+		if (deleteGroup || removeButtonPushed) {
+			listAdapter.setRemoveParent(false);
+			listAdapter.setRemoveChild(false);
+			removeButtonPushed = false;
+			deleteGroup = false;
+			listAdapter.changedLayout(true);
+			listAdapter.notifyDataSetChanged();
+			listAdapter.notifyDataSetInvalidated();
+			return;
+		}
+		AlertDialog.Builder alert = createOptionDialog();
+		alert.show();
+	}
+	
+	public void removeHelper() {
+		if (removeWhich[0]) { //User chose to remove a project.
+			startRemoveParent();
+		} else if (removeWhich[1]) { //user chose to remove recordings.
+			startRemoveChild();
+		}
 	}
 	
 	
