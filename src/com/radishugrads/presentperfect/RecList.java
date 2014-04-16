@@ -48,9 +48,7 @@ public class RecList extends Activity {
     private int currExpanded = -1;
     private boolean deleteGroup;
     private int[] removeInfo = new int[2]; //index 0 is groupPosition, index 1 is childPosition 
-    private boolean[] removeWhich = new boolean[2]; //index 0 is for (removeProjects?), index 1 is for (removeRecordings?) 
-    private boolean changeback = false; //Delete and remove if statements when done
-    
+    private boolean[] removeWhich = new boolean[2]; //index 0 is for (removeProjects?), index 1 is for (removeRecordings?)
 	
     @Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -131,10 +129,8 @@ public class RecList extends Activity {
 	            	} else if (childPosition == ADD_CHILD) {
 	            		add(v, "child", groupPosition);
 	            	} else {
-	            		if (changeback) {
 	            			Intent i = new Intent(context, RecorderActivity.class);
 	            			startActivity(i);
-	            		}
 	            	}
 	                return false;
 	            }
@@ -283,10 +279,8 @@ public class RecList extends Activity {
 			listDataChild.put(listDataHeader.get(size), new_group);
 		}
 		listAdapter.notifyDataSetChanged();
-		if (changeback) {
 			Intent i = new Intent(context, RecorderActivity.class);
 			startActivity(i);
-		}
 	}
 
 	private void startRemoveChild() {
