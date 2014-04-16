@@ -418,7 +418,7 @@ public class RecList extends Activity {
         five.add("Rec 6 - 04/03/14");
         five.add("Rec 7 - 04/07/14");
 	
-        listDataChild.put(listDataHeader.get(0), one); // Header, Child data
+        listDataChild.put(listDataHeader.get(0), one);
         listDataChild.put(listDataHeader.get(1), two);
         listDataChild.put(listDataHeader.get(2), three);
         listDataChild.put(listDataHeader.get(3), four);
