@@ -279,8 +279,10 @@ public class RecList extends Activity {
 			listDataChild.put(listDataHeader.get(size), new_group);
 		}
 		listAdapter.notifyDataSetChanged();
-			Intent i = new Intent(context, RecorderActivity.class);
-			startActivity(i);
+			if (!isGroup) {
+				Intent i = new Intent(context, RecorderActivity.class);
+				startActivity(i);
+			}
 	}
 
 	private void startRemoveChild() {
