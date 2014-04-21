@@ -21,6 +21,9 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
     private List<String> _listDataHeader; // header titles
     // child data in format of header title, child title
     private HashMap<String, List<String>> _listDataChild;
+    private boolean childRemoveOn = false;
+    private boolean parentRemoveOn = false;
+    private boolean changedLayout = false;
  
     public ExpandableListAdapter(Context context, List<String> listDataHeader,
             HashMap<String, List<String>> listChildData) {
@@ -28,7 +31,19 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
         this._listDataHeader = listDataHeader;
         this._listDataChild = listChildData;
     }
- 
+    
+    public void setRemoveChild(boolean remove) {
+    	childRemoveOn = remove;
+    }
+    
+    public void setRemoveParent(boolean remove) {
+    	parentRemoveOn = remove;
+    }
+    
+    public void changedLayout(boolean yes_or_no) {
+    	changedLayout = yes_or_no; 
+    }
+    
     @Override
     public Object getChild(int groupPosition, int childPosititon) {
         return this._listDataChild.get(this._listDataHeader.get(groupPosition))
@@ -46,15 +61,17 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
  
         final String childText = (String) getChild(groupPosition, childPosition);
  
-        if (convertView == null) {
+        if (convertView == null || changedLayout) {
             LayoutInflater infalInflater = (LayoutInflater) this._context
                     .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            convertView = infalInflater.inflate(R.layout.list_item, null);
+            if (childRemoveOn && !(childText.equals(RecList.ADD_BUTTON))) { //Remove option selected
+                convertView = infalInflater.inflate(R.layout.list_item_rem, null);
+            } else { //Remove option not selected
+            	convertView = infalInflater.inflate(R.layout.list_item, null);
+            }
         }
- 
         TextView txtListChild = (TextView) convertView
                 .findViewById(R.id.lblListItem);
- 
         txtListChild.setText(childText);
         return convertView;
     }
@@ -84,10 +101,14 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
     public View getGroupView(int groupPosition, boolean isExpanded,
             View convertView, ViewGroup parent) {
         String headerTitle = (String) getGroup(groupPosition);
-        if (convertView == null) {
+        if (convertView == null || changedLayout) {
             LayoutInflater infalInflater = (LayoutInflater) this._context
                     .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            if (parentRemoveOn) {
+            	convertView = infalInflater.inflate(R.layout.list_group_rem, null);
+            } else {
             convertView = infalInflater.inflate(R.layout.list_group, null);
+            }
         }
  
         TextView lblListHeader = (TextView) convertView
