@@ -37,6 +37,7 @@ public class RecorderActivity extends Activity {
 	
 	// time displays (default is stopwatch)
 	Handler handler;
+	boolean isStopwatch;
 	int timeInSecs;
 	
 	// animation
