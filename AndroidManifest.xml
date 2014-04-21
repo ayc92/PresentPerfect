@@ -9,6 +9,8 @@
         android:targetSdkVersion="18" />
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <application
         android:allowBackup="true"
@@ -26,8 +28,17 @@
         </activity>
         <activity
             android:name="com.radishugrads.presentperfect.RecorderActivity"
-            android:label="@string/recorder_activity" >
+            android:label="Recorder" >
         </activity>
+        <activity
+            android:name="com.radishugrads.presentperfect.OptionsActivity"
+            android:label="Options" >
+        </activity>
+        <activity
+            android:name="com.radishugrads.presentperfect.Info"
+            android:label="Info" >
+        </activity>
+        <activity android:name="com.radishugrads.presentperfect.RecList" > </activity>
     </application>
 
 </manifest>
