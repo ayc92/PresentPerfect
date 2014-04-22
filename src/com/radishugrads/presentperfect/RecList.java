@@ -9,6 +9,7 @@ import java.util.List;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.View;
@@ -39,6 +40,7 @@ public class RecList extends Activity {
     private boolean isGroup = false;
     private int lastId = -1;
     private final int ADDGROUP = -10;
+    Activity main = this;
 	
     @Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -81,7 +83,8 @@ public class RecList extends Activity {
 	            	if (childPosition == ADD_CHILD) {
 	            		add(v, "child", groupPosition);
 	            	} else {
-	            		//GO TO THE INFO SCREEN FOR THAT RECORDING
+	            		Intent recordIntent = new Intent(main, RecorderActivity.class);
+	            		startActivity(recordIntent);
 	            	}
 	                return false;
 	            }
@@ -154,6 +157,8 @@ public class RecList extends Activity {
 			listDataChild.put(listDataHeader.get(size), new_group);
 		}
 		listAdapter.notifyDataSetChanged();
+		Intent recordIntent = new Intent(main, RecorderActivity.class);
+		startActivity(recordIntent);
 	}
 	
 	
