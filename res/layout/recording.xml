@@ -18,7 +18,7 @@
         android:layout_width="fill_parent"
         android:layout_gravity="center_vertical|center_horizontal"
         android:foregroundGravity="center"
-        android:background="@android:color/darker_gray"
+        android:background="#CECECE"
         android:layout_marginBottom="40dp"
         android:orientation="horizontal" >
         <ImageButton
@@ -26,16 +26,16 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical|center_horizontal"
-            android:src="@drawable/ic_action_pause"
-            android:background="@android:color/darker_gray"
+            android:src="@drawable/ic_action_pause_black_large"
+            android:background="#CECECE"
             android:onClick="onRecordPressed" />
         <ImageButton
             android:id="@+id/begin_record"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical|center_horizontal"
-            android:src="@drawable/ic_action_mic"
-            android:background="@android:color/darker_gray"
+            android:src="@drawable/ic_action_mic_black_large"
+            android:background="#CECECE"
             android:onClick="onRecordPressed" />
     </FrameLayout>
     
