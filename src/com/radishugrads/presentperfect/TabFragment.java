@@ -9,10 +9,13 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 
 public abstract class TabFragment extends Fragment {
 	
 	View currentTabView;
+	ImageButton addButton;
+	ImageButton delButton;
 	
 	Context context;
 	Context appContext;
@@ -26,11 +29,9 @@ public abstract class TabFragment extends Fragment {
 		context = getActivity();
 		appContext = context.getApplicationContext();
 		currentTabView = inflater.inflate(R.layout.activity_rec_list, container, false);
-//		expListView = (ExpandableListView) currentTabView.findViewById(R.id.lvExp);
-//		prepareList();
-//		listAdapter = new ExpandableListAdapter(context, listDataHeader, listDataChild);
-//		expListView.setAdapter(listAdapter);
-//		setUp();
+		addButton = (ImageButton) currentTabView.findViewById(R.id.add);
+//		addButton.setOnClickListener();
+		delButton = (ImageButton) currentTabView.findViewById(R.id.removeParent);
 		setUpView();
 		return currentTabView;
 	}
