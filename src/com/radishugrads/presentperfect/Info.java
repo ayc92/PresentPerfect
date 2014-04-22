@@ -7,6 +7,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Color;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -96,6 +97,12 @@ public class Info extends Activity {
 		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.info, menu);
 		return true;
+	}
+	
+	@Override
+	public void onBackPressed() {
+		Intent recordIntent = new Intent(this, RecList.class);
+		startActivity(recordIntent);
 	}
 	
 	public void tempHardcode(){
