@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-	<!-- App name! -->
+
+    <!-- App name! -->
     <string name="app_name">Present Perfect</string>
     <string name="action_settings">Options</string>
     <string name="start_recording">Start Recording</string>
@@ -11,5 +12,6 @@
     <string name="hello_world">Hello world!</string>
     <string name="create">Create!</string>
     <string name="cancel">Cancel</string>
+    <string name="title_activity_splash">SplashActivity</string>
 
 </resources>
