@@ -1,14 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent" >
+    android:layout_height="match_parent"
+    android:background="#CECECE" >
     
     <FrameLayout
         android:id="@+id/top_margin"
         android:layout_alignParentTop="true"
         android:layout_centerVertical="true"
         android:layout_width="fill_parent"
-        android:layout_height="100dp" >
+        android:layout_height="75dp" >
     </FrameLayout>
     
     <FrameLayout
@@ -18,35 +19,48 @@
         android:layout_width="fill_parent"
         android:layout_gravity="center_vertical|center_horizontal"
         android:foregroundGravity="center"
-        android:background="#CECECE"
+        android:background="@drawable/recorder_bg"
         android:layout_marginBottom="40dp"
-        android:orientation="horizontal" >
+        android:orientation="horizontal"
+        android:layout_marginLeft="15dp"
+        android:layout_marginRight="15dp" >
         <ImageButton
             android:id="@+id/pause_record"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical|center_horizontal"
             android:src="@drawable/ic_action_pause_black_large"
-            android:background="#CECECE"
-            android:onClick="onRecordPressed" />
+            android:background="#fff"
+            android:onClick="onRecordPressed" />      
         <ImageButton
             android:id="@+id/begin_record"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical|center_horizontal"
             android:src="@drawable/ic_action_mic_black_large"
-            android:background="#CECECE"
+            android:background="#fff"
             android:onClick="onRecordPressed" />
     </FrameLayout>
     
-    <TextView
-        android:id="@+id/time_display"
+    <FrameLayout
         android:layout_below="@id/buttons_container"
         android:layout_height="wrap_content"
-        android:layout_width="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_centerVertical="true"
-        android:text="@string/init_time"
-        android:textSize="60sp" />
+        android:layout_width="fill_parent"
+        android:layout_gravity="center_vertical|center_horizontal"
+        android:foregroundGravity="center"
+        android:background="@drawable/recorder_bg"
+        android:layout_marginLeft="15dp"
+        android:layout_marginRight="15dp" >
+        <TextView
+            android:id="@+id/time_display"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:layout_gravity="center_vertical|center_horizontal"
+        	android:foregroundGravity="center"
+        	android:text="@string/init_time"
+        	android:textSize="80sp"
+        	android:textColor="#187DBD" >          
+        </TextView>
+    </FrameLayout>
 
 </RelativeLayout>
