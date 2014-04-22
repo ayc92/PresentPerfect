@@ -114,6 +114,7 @@ public class Info extends Activity {
 	public void onBackPressed() {
 		Intent recordIntent = new Intent(this, RecList.class);
 		startActivity(recordIntent);
+		finish();
 	}
 	
 	public void tempHardcode(){
