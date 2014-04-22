@@ -12,7 +12,7 @@ public class MotherBrain extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		// setContentView(R.layout.activity_mother_brain);
-		Intent recordIntent = new Intent(this, RecList.class);
+		Intent recordIntent = new Intent(this, RecorderActivity.class);
 		startActivity(recordIntent);
 	}
 
