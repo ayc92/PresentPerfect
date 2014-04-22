@@ -4,6 +4,12 @@ import java.util.HashMap;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.media.AudioFormat;
+import android.media.AudioManager;
+import android.media.AudioRecord;
+import android.media.AudioTrack;
+import android.media.MediaRecorder;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.Menu;
@@ -38,6 +44,15 @@ public class RecorderActivity extends Activity {
 	// flags
 	boolean isRecording;
 	boolean animEnabled;
+	boolean isPaused;
+	
+	// recording variables
+	static final int SAMPLE_RATE = 8000;
+	byte[] buffer;
+	AudioRecord recorder;
+	int bufReadResult;
+	AudioTrack audioTrack;
+	RecordTask recordTask;
 	
 	// data variables
 	HashMap<String, Integer> wordCounts;
@@ -76,10 +91,29 @@ public class RecorderActivity extends Activity {
 		// set flags
 		isRecording = false;
 		animEnabled = true;
+		isPaused = false;
 		
 		// setup timer
 		handler = new Handler();
 		timeInSecs = 0;
+		
+		// setup sound recorder and audio track
+		int bufferSize = AudioRecord.getMinBufferSize(SAMPLE_RATE, AudioFormat.CHANNEL_IN_MONO,
+		        AudioFormat.ENCODING_PCM_16BIT);
+		buffer = new byte[bufferSize];
+		recorder = new AudioRecord(
+				MediaRecorder.AudioSource.MIC,
+				SAMPLE_RATE,
+				AudioFormat.CHANNEL_IN_MONO,
+		        AudioFormat.ENCODING_PCM_16BIT,
+		        bufferSize);
+		audioTrack = new AudioTrack(
+        		AudioManager.STREAM_MUSIC,
+        		SAMPLE_RATE,
+        		AudioFormat.CHANNEL_OUT_MONO,
+        		AudioFormat.ENCODING_PCM_16BIT,
+        		bufferSize,
+        		AudioTrack.MODE_STATIC);
 	}
 
 	@Override
@@ -111,27 +145,28 @@ public class RecorderActivity extends Activity {
 		int vid = v.getId();
 		switch (vid) {
 			case R.id.begin_record:
-				if (animEnabled) {
-					isRecording = !isRecording;
-					if (isRecording) {
-						System.out.println("in here");
+				// if the user ever presses this button twice consecutively, goto feedback screen
+				if (isRecording || isPaused) {
+					System.out.println("in here");
+					recordButton.setImageResource(R.drawable.ic_action_mic);
+					handler.removeCallbacks(updateTime);
+					Intent recordIntent = new Intent(this, Info.class);
+					startActivity(recordIntent);
+				} else {
+					System.out.println("in here 2");
+					if (animEnabled) {
 						slideButtons();
-						recordButton.setImageResource(R.drawable.ic_action_mic_active);
-						// start timer/stopwatch
-						handler.postDelayed(updateTime, 0);
-						
-						// TODO: begin recording and speech recognition
-					} else {
-						System.out.println("in here 2");
-						recordButton.setImageResource(R.drawable.ic_action_mic);
-						handler.removeCallbacks(updateTime);
-						
-						//after one start/stop record cycle, disable animation and recording capability
 						animEnabled = false;
-						Intent recordIntent = new Intent(this, Info.class);
-						startActivity(recordIntent);
 					}
+					recordButton.setImageResource(R.drawable.ic_action_mic_active);
+					// start timer/stopwatch
+					handler.postDelayed(updateTime, 0);
+					
+					// TODO: speech recognition
+					recorder.startRecording();
+					runNewRecordTask();
 				}
+				isRecording = !isRecording;
 				break;
 			case R.id.pause_record:
 				if (isRecording) {
@@ -140,7 +175,9 @@ public class RecorderActivity extends Activity {
 				} else {
 					pauseButton.setImageResource(R.drawable.ic_action_pause);
 					handler.postDelayed(updateTime, 0);
+					runNewRecordTask();
 				}
+				isPaused = !isPaused;
 				isRecording = !isRecording;
 				break;
 		}
@@ -179,5 +216,26 @@ public class RecorderActivity extends Activity {
 		public void onAnimationStart(Animation animation) {
 		}
 		
+	}
+	
+	// helper method for starting a new record task
+	public void runNewRecordTask() {
+		recordTask = new RecordTask();
+		recordTask.execute();
+	}
+	
+	// async task for recording in background thread
+	private class RecordTask extends AsyncTask<Void, Void, Void> {
+		@Override
+		protected Void doInBackground(Void... params) {
+			while(isRecording) {
+				bufReadResult = recorder.read(buffer, 0, buffer.length);
+				// TODO: make this into a track that can be played back
+				// System.out.println(audioTrack.write(buffer, 0, bufReadResult) + " bytes written to track.");
+				// System.out.println(bufReadResult);				
+			}
+			recorder.stop();
+			return null;
+		}
 	}
 }
