@@ -1,58 +1,86 @@
 package com.radishugrads.presentperfect;
 
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
-import android.app.Activity;
-import android.app.AlertDialog;
-import android.content.DialogInterface;
+import android.app.ActionBar;
+import android.app.ActionBar.Tab;
+import android.app.ActionBar.TabListener;
+import android.app.FragmentTransaction;
+import android.app.ListActivity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.view.ViewPager;
 import android.view.Menu;
-import android.view.View;
-import android.widget.EditText;
 import android.widget.ExpandableListView;
-import android.widget.ExpandableListView.OnChildClickListener;
-import android.widget.ExpandableListView.OnGroupExpandListener;
-
 
 /*
  * Code based on tutorial:
  * http://www.androidhive.info/2013/07/android-expandable-list-view-tutorial/
  */
-public class RecList extends Activity {
+public class RecList extends MotherBrain implements TabListener {
 	
 	ExpandableListAdapter listAdapter;
     ExpandableListView expListView;
     List<String> listDataHeader;
     HashMap<String, List<String>> listDataChild;
-    private AlertDialog.Builder alert;
-    private final int NONE_EXPANDED = -1;
-    private int lastExpanded = NONE_EXPANDED;
-    private final String ADD_BUTTON = "[  Add New Recording  ]";
-    private final int ADD_CHILD = 0;
-    private String newest_input = "";
-    private boolean isTyping = false;
-    private boolean changed = false;
-    private boolean isGroup = false;
-    private int lastId = -1;
-    private final int ADDGROUP = -10;
-    Activity main = this;
+    public final static String ADD_BUTTON = "[  Add New Recording  ]";
+    
+    
+    private ViewPager viewPager;
+    private TabsPagerAdapter mAdapter;
+    
+    // Tab titles
+    private final String[] tabs = { "Notifications", "My Pitches", "Shared With Me", "Contacts" };
 	
     @Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_rec_list);
-		 // get the listview
+		//setContentView(R.layout.activity_rec_list);
+		setContentView(R.layout.tabs_view);
+		// Initilization
+        viewPager = (ViewPager) findViewById(R.id.pager);
+        mAdapter = new TabsPagerAdapter(getSupportFragmentManager());
+        viewPager.setAdapter(mAdapter);
+        
+        formatActionBar("Home");
+        actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+        
+        // Adding Tabs
+        for (String tab_name : tabs) {
+            actionBar.addTab(actionBar.newTab().setText(tab_name)
+                    .setTabListener(this));
+        }
+        
+        /**
+         * on swiping the viewpager make respective tab selected
+         * */
+        viewPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+         
+            @Override
+            public void onPageSelected(int position) {
+                // on changing the page
+                // make respected tab selected
+                actionBar.setSelectedNavigationItem(position);
+            }
+         
+            @Override
+            public void onPageScrolled(int arg0, float arg1, int arg2) {
+            }
+         
+            @Override
+            public void onPageScrollStateChanged(int arg0) {
+            }
+        });
+        
+		// get the listview
+        /*
         expListView = (ExpandableListView) findViewById(R.id.lvExp);
         prepareList();
-        listAdapter = new ExpandableListAdapter(this, listDataHeader, listDataChild);
+        listAdapter = new ExpandableListAdapter(context, listDataHeader, listDataChild);
         expListView.setAdapter(listAdapter);
-        alert = new AlertDialog.Builder(this);
         setUp();
+        */
 	}
 	
 	@Override
@@ -61,177 +89,33 @@ public class RecList extends Activity {
 		getMenuInflater().inflate(R.menu.mother_brain, menu);
 		return true;
 	}
-	
-	private void setUp() {
-		expListView.setOnGroupExpandListener(new OnGroupExpandListener() {
-			
-			@Override
-			public void onGroupExpand(int groupPosition) {
-				if (lastExpanded != NONE_EXPANDED &&
-						groupPosition != lastExpanded) {
-					expListView.collapseGroup(lastExpanded);
-				}
-				lastExpanded = groupPosition;
-			}
-		});
-		
-		 expListView.setOnChildClickListener(new OnChildClickListener() {
-			 
-	            @Override
-	            public boolean onChildClick(ExpandableListView parent, View v,
-	                    int groupPosition, int childPosition, long id) {
-	            	if (childPosition == ADD_CHILD) {
-	            		add(v, "child", groupPosition);
-	            	} else {
-	            		Intent recordIntent = new Intent(main, RecorderActivity.class);
-	            		startActivity(recordIntent);
-	            	}
-	                return false;
-	            }
-	        });
-	}
-	public void addClick(View v) {
-		add(v, "group", -10);
-	}
-	
-	public void add(View v, String group_or_child, int id) {
-		lastId = id;
-		isTyping = true;
-		changed = false;
-		if (group_or_child == "group") {
-			isGroup = true;
-		} else if (group_or_child == "child") {
-			isGroup = false;
-		}
-		String other = "new project";
-		if (!(isGroup)) {
-			other = "new recording";
-		}
-		alert.setTitle(other.toUpperCase());
-		alert.setMessage("Input name of "+ other + ".");
-		final EditText input = new EditText(this);
-		alert.setView(input);
-		alert.setPositiveButton(R.string.create, new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int whichButton) {
-				newest_input = input.getText().toString();
-				changed = true;
-				if (newest_input.length() < 1) {
-					changed = false;
-				}
-				update_list();
-				}
-			});
-		
-		alert.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-			  public void onClick(DialogInterface dialog, int whichButton) {
-			    // Canceled.
-				  changed = false;
-			  }
-			});
 
-		alert.show();
+	@Override
+	public void onTabReselected(Tab tab, FragmentTransaction ft) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onTabSelected(Tab tab, FragmentTransaction ft) {
+		// on tab selected
+        // show respected fragment view
+        viewPager.setCurrentItem(tab.getPosition());
+	}
+
+	@Override
+	public void onTabUnselected(Tab tab, FragmentTransaction ft) {
+		// TODO Auto-generated method stub
+		
 	}
 	
-	private void update_list() {
-		if (changed) {
-		addGroup(newest_input, isGroup, lastId);
-		}
+	@Override
+	public void onBackPressed() {
+		Intent i = new Intent();
+		i.setAction(Intent.ACTION_MAIN);
+		i.addCategory(Intent.CATEGORY_HOME);
+		startActivity(i); 
+		finish(); 
 	}
-	
-	public void addGroup(String name, boolean isGroup, int which){ //Which refers to id of group or id of child
-		SimpleDateFormat s = new SimpleDateFormat("MM-dd-yyyy");
-		String timeStamp = s.format(new Date()); // Find todays date
-		boolean empty = false;
-		if (!(isGroup) && (which != ADDGROUP)) {
-			empty = (listAdapter.getChildrenCount(which)-1 == 0);
-			}
-		if (!(isGroup)) {
-			listDataChild.get(listDataHeader.get(which)).add(newest_input + " - " + timeStamp);
-		} else if (!(empty) && !(isGroup)) {
-			listDataChild.get(listDataHeader.get(which)).add(newest_input + " - " + timeStamp);
-		} else if (isGroup) {
-			int size = listAdapter.getGroupCount();
-			listDataHeader.add(name);
-			List<String>  new_group = new ArrayList<String>();
-			new_group.add(ADD_BUTTON);
-			listDataChild.put(listDataHeader.get(size), new_group);
-		}
-		listAdapter.notifyDataSetChanged();
-		Intent recordIntent = new Intent(main, RecorderActivity.class);
-		startActivity(recordIntent);
-	}
-	
-	
-	/*
-	 * Put dummy stuff in list for prototype.
-	 */
-	private void prepareList() {
-		listDataHeader = new ArrayList<String>();
-        listDataChild = new HashMap<String, List<String>>();
-        
-        // Adding projects/headers
-        listDataHeader.add("Google Pitch");
-        listDataHeader.add("Angel Pitch");
-        listDataHeader.add("Rich People Pitch");
-        listDataHeader.add("Tech Convention Speech");
-        listDataHeader.add("VC Pitch");
-	
-        //Adding recordings/children
-     // Adding child data
-        List<String>  one = new ArrayList<String>();
-        one.add(ADD_BUTTON);
-        one.add("Rec 1 - 04/01/14");
-        one.add("Rec 2 - 04/01/14");
-        one.add("Rec 3 - 04/02/14");
-        one.add("Rec 4 - 04/02/14");
-        one.add("Rec 5 - 04/02/14");
-        one.add("Rec 6 - 04/03/14");
-        one.add("Rec 7 - 04/07/14");
-        
-        List<String>  two = new ArrayList<String>();
-        two.add(ADD_BUTTON);
-        two.add("Rec 1 - 04/01/14");
-        two.add("Rec 2 - 04/01/14");
-        two.add("Rec 3 - 04/02/14");
-        two.add("Rec 4 - 04/02/14");
-        two.add("Rec 5 - 04/02/14");
-        two.add("Rec 6 - 04/03/14");
-        two.add("Rec 7 - 04/07/14");
-        
-        List<String>  three = new ArrayList<String>();
-        three.add(ADD_BUTTON);
-        three.add("Rec 1 - 04/01/14");
-        three.add("Rec 2 - 04/01/14");
-        three.add("Rec 3 - 04/02/14");
-        three.add("Rec 4 - 04/02/14");
-        three.add("Rec 5 - 04/02/14");
-        three.add("Rec 6 - 04/03/14");
-        three.add("Rec 7 - 04/07/14");
-        
-        List<String>  four = new ArrayList<String>();
-        four.add(ADD_BUTTON);
-        four.add("Rec 1 - 04/01/14");
-        four.add("Rec 2 - 04/01/14");
-        four.add("Rec 3 - 04/02/14");
-        four.add("Rec 4 - 04/02/14");
-        four.add("Rec 5 - 04/02/14");
-        four.add("Rec 6 - 04/03/14");
-        four.add("Rec 7 - 04/07/14");
-	
-        List<String>  five = new ArrayList<String>();
-        five.add(ADD_BUTTON);
-        five.add("Rec 1 - 04/01/14");
-        five.add("Rec 2 - 04/01/14");
-        five.add("Rec 3 - 04/02/14");
-        five.add("Rec 4 - 04/02/14");
-        five.add("Rec 5 - 04/02/14");
-        five.add("Rec 6 - 04/03/14");
-        five.add("Rec 7 - 04/07/14");
-	
-        listDataChild.put(listDataHeader.get(0), one); // Header, Child data
-        listDataChild.put(listDataHeader.get(1), two);
-        listDataChild.put(listDataHeader.get(2), three);
-        listDataChild.put(listDataHeader.get(3), four);
-        listDataChild.put(listDataHeader.get(4), five);
-	}
+
 }

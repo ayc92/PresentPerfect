@@ -1,7 +1,11 @@
 package com.radishugrads.presentperfect;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -54,6 +58,9 @@ public class Info extends Activity {
 	ArrayList<String> good_items = new ArrayList<String>();
 	ArrayList<String> bad_items = new ArrayList<String>();
 	ArrayList<String> all_items = new ArrayList<String>();
+	
+	private MediaPlayer   mPlayer = null;
+	String filePath = null;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -90,6 +97,10 @@ public class Info extends Activity {
 //		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 //		spinner1.setAdapter(adapter);
 		spinner1.setOnItemSelectedListener(new SpinnerActivity1());
+		
+//		Intent intent = getIntent();
+//		filePath = intent.getExtras().getString("recordPath");
+		filePath = getFilesDir() + "/audiotest.3gp";
 	}
 
 	@Override
@@ -103,6 +114,7 @@ public class Info extends Activity {
 	public void onBackPressed() {
 		Intent recordIntent = new Intent(this, RecList.class);
 		startActivity(recordIntent);
+		finish();
 	}
 	
 	public void tempHardcode(){
@@ -231,11 +243,11 @@ public class SpinnerActivity1 extends Activity implements OnItemSelectedListener
 	    }
 	}
 
-public void shareAction(View v){
+	public void shareAction(View v){
 	
-	AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
-			this);
-	LayoutInflater inflater = getLayoutInflater();
+		AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
+				this);
+		LayoutInflater inflater = getLayoutInflater();
 
     // Inflate and set the layout for the dialog
     // Pass null as the parent view because its going in the dialog layout
@@ -281,6 +293,20 @@ public void shareAction(View v){
 
 			// show it
 			alertDialog.show();
+	}
+
+	public void playback(View v) {
+		mPlayer = new MediaPlayer();
+        try {
+			File mFile = new File(filePath);
+	    	FileInputStream inputStream = new FileInputStream(mFile);
+	    	mPlayer.setDataSource(inputStream.getFD());
+	    	inputStream.close();
+            mPlayer.prepare();
+            mPlayer.start();
+        } catch (IOException e) {
+            Log.e("", "prepare() failed");
+        }
 	}
 
 }
