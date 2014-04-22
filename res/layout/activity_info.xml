@@ -6,6 +6,9 @@
 	android:id="@+id/p_layout"
 	android:background="#cfcece"
     tools:context=".Info" >
+<ScrollView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content">
 <LinearLayout
     android:orientation="vertical"
     android:layout_width="match_parent"
@@ -26,12 +29,14 @@
         android:layout_height="45dp"
         android:layout_marginRight="25dp"
         android:layout_gravity="center_horizontal|center_vertical"
+        android:background="@android:color/transparent"
         android:src="@drawable/skipb" />
     <ImageView
         android:id="@+id/playrec"
         android:layout_width="85dp"
         android:layout_height="85dp"
         android:layout_gravity="center_horizontal"
+        android:background="@android:color/transparent"
         android:src="@drawable/playlightblue" />
         <ImageView
         android:id="@+id/skipforward"
@@ -39,6 +44,7 @@
         android:layout_height="45dp"
         android:layout_marginLeft="25dp"
         android:layout_gravity="center_horizontal|center_vertical"
+        android:background="@android:color/transparent"
         android:src="@drawable/skipf" />
     </LinearLayout>
 <TextView
@@ -219,4 +225,5 @@
     	android:onClick="shareAction"
         android:src="@drawable/shareblue" />
 </LinearLayout>
+</ScrollView>
 </LinearLayout>
