@@ -1,7 +1,11 @@
 package com.radishugrads.presentperfect;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -237,11 +241,11 @@ public class SpinnerActivity1 extends Activity implements OnItemSelectedListener
 	    }
 	}
 
-public void shareAction(View v){
+	public void shareAction(View v){
 	
-	AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
-			this);
-	LayoutInflater inflater = getLayoutInflater();
+		AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
+				this);
+		LayoutInflater inflater = getLayoutInflater();
 
     // Inflate and set the layout for the dialog
     // Pass null as the parent view because its going in the dialog layout
@@ -287,6 +291,7 @@ public void shareAction(View v){
 
 			// show it
 			alertDialog.show();
+	}
 
 	public void playback(View v) {
 		mPlayer = new MediaPlayer();
