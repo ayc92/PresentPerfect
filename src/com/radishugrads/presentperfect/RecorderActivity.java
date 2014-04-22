@@ -1,10 +1,8 @@
 package com.radishugrads.presentperfect;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.HashMap;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.media.AudioFormat;
 import android.media.AudioManager;
@@ -15,7 +13,6 @@ import android.media.MediaRecorder;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -27,7 +24,7 @@ import android.widget.ImageButton;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-public class RecorderActivity extends Activity {
+public class RecorderActivity extends MotherBrain {
 	
 	// views
 	RelativeLayout recordView;
@@ -72,6 +69,9 @@ public class RecorderActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.recording);
 		
+		// format action bar
+		formatActionBar("Recorder");
+		
 		// get needed views
 		recordButton = (ImageButton) findViewById(R.id.begin_record);
 		pauseButton = (ImageButton) findViewById(R.id.pause_record);
@@ -83,7 +83,7 @@ public class RecorderActivity extends Activity {
 		
 		// setup animations
 		slideLeft = new TranslateAnimation (
-				Animation.RELATIVE_TO_SELF, 0.0f, Animation.RELATIVE_TO_SELF, -0.7f,
+				Animation.RELATIVE_TO_SELF, 0.0f, Animation.RELATIVE_TO_SELF, -0.5f,
 				Animation.RELATIVE_TO_SELF, 0.0f, Animation.RELATIVE_TO_SELF, 0.0f
 				);
 		slideLeft.setFillEnabled(true);
@@ -91,7 +91,7 @@ public class RecorderActivity extends Activity {
 		slideLeft.setAnimationListener(new SlideListenerWithView((View) recordButton, -1));
 		
 		slideRight = new TranslateAnimation (
-				Animation.RELATIVE_TO_SELF, 0.0f, Animation.RELATIVE_TO_SELF, 0.7f,
+				Animation.RELATIVE_TO_SELF, 0.0f, Animation.RELATIVE_TO_SELF, 0.5f,
 				Animation.RELATIVE_TO_SELF, 0.0f, Animation.RELATIVE_TO_SELF, 0.0f
 				);
 		slideRight.setDuration(500);
@@ -160,13 +160,8 @@ public class RecorderActivity extends Activity {
 				// if the user ever presses this button twice consecutively, goto feedback screen
 				if (isRecording || isPaused) {
 					System.out.println("in here");
-					recordButton.setImageResource(R.drawable.ic_action_mic);
+					recordButton.setImageResource(R.drawable.ic_action_mic_black_large);
 					handler.removeCallbacks(updateTime);
-					
-					mRecorder.stop();
-			    	mRecorder.reset();
-			        mRecorder.release();
-			        mRecorder = null;
 			        
 					Intent recordIntent = new Intent(this, Info.class);
 					recordIntent.putExtra("recordPath", filePath);
@@ -177,40 +172,22 @@ public class RecorderActivity extends Activity {
 						slideButtons();
 						animEnabled = false;
 					}
-					recordButton.setImageResource(R.drawable.ic_action_mic_active);
+					recordButton.setImageResource(R.drawable.ic_action_mic_black_large_active_2);
 					// start timer/stopwatch
 					handler.postDelayed(updateTime, 0);
 					
 					// TODO: speech recognition
-//					recorder.startRecording();
-					runNewRecordTask();
-					
-					mRecorder = new MediaRecorder();
-			        mRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
-			        mRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
-			        mRecorder.setOutputFile(filePath);
-			        mRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
 
-			        try {
-			            mRecorder.prepare();
-			        } catch (IOException e) {
-			            Log.e("", "prepare() failed");
-			        }
-
-			        mRecorder.start();
 				}
 				isRecording = !isRecording;
 				break;
 			case R.id.pause_record:
 				if (isRecording) {
-					pauseButton.setImageResource(R.drawable.ic_action_play);
+					pauseButton.setImageResource(R.drawable.ic_action_play_black_large);
 					handler.removeCallbacks(updateTime);
-					mRecorder.stop();
 				} else {
-					mRecorder.start();
-					pauseButton.setImageResource(R.drawable.ic_action_pause);
+					pauseButton.setImageResource(R.drawable.ic_action_pause_black_large);
 					handler.postDelayed(updateTime, 0);
-					runNewRecordTask();
 				}
 				isPaused = !isPaused;
 				isRecording = !isRecording;
@@ -240,7 +217,7 @@ public class RecorderActivity extends Activity {
 		
 		@Override
 		public void onAnimationEnd(Animation animation) {
-			v.setX(v.getX() + direction * v.getWidth() * 0.7f);
+			v.setX(v.getX() + direction * v.getWidth() * 0.5f);
 		}
 
 		@Override

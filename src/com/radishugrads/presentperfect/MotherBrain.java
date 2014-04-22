@@ -1,26 +1,17 @@
 package com.radishugrads.presentperfect;
 
+import android.app.ActionBar;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
+import android.support.v4.app.FragmentActivity;
 
-import android.app.Activity;
-import android.content.Intent;
-import android.os.Bundle;
-import android.view.Menu;
+public abstract class MotherBrain extends FragmentActivity {
+	ActionBar actionBar;
 
-public class MotherBrain extends Activity {
-	
-	@Override
-	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		// setContentView(R.layout.activity_mother_brain);
-		Intent recordIntent = new Intent(this, RecList.class);
-		startActivity(recordIntent);
+	void formatActionBar(String subtitle) {
+		actionBar = getActionBar();
+        actionBar.setBackgroundDrawable(new ColorDrawable(Color.rgb(0, 72, 108)));
+        actionBar.setTitle("PresentPerfect");
+        actionBar.setSubtitle(subtitle);
 	}
-
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.mother_brain, menu);
-		return true;
-	}
-
 }

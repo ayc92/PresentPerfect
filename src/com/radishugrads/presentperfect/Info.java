@@ -98,8 +98,9 @@ public class Info extends Activity {
 //		spinner1.setAdapter(adapter);
 		spinner1.setOnItemSelectedListener(new SpinnerActivity1());
 		
-		Intent intent = getIntent();
-		filePath = intent.getExtras().getString("recordPath");
+//		Intent intent = getIntent();
+//		filePath = intent.getExtras().getString("recordPath");
+		filePath = getFilesDir() + "/audiotest.3gp";
 	}
 
 	@Override

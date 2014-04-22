@@ -6,4 +6,7 @@
     <color name="green">#52b848</color>
     <color name="gold">#fed402</color>
     <color name="red">#d22027</color>
+    <color name="bg_grey">#CECECE</color>
+    <color name="mod_black">#040707</color>
+    <color name="mod_red">#DA132B</color>
 </resources>
