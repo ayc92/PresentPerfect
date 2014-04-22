@@ -3,16 +3,33 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
 	android:orientation="vertical"
+	android:background="#cfcece"
     tools:context=".OptionsActivity" >
-
+<LinearLayout
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_marginLeft="20dp"
+    android:layout_marginRight="20dp"
+    android:layout_gravity="center_horizontal">
+    <LinearLayout
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="40dp"
+    android:layout_marginTop="20dp"
+    android:paddingTop="20dp"
+    android:paddingBottom="20dp"
+	android:background="#ffffff"
+    android:layout_gravity="center_horizontal">
     <TextView
+        android:fontFamily="sans-serif-light"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="35sp"
-        android:layout_marginTop="20dp"
-        android:layout_marginLeft="5dp"
-        android:fontFamily="sans-serif-black"
-        android:textStyle="bold"
+        android:textSize="30sp"
+        android:background="#ffffff"
+        android:textColor="#2b7cc0"
+        android:paddingLeft="20dp"
         android:text="Timing Mode" />
     
     <LinearLayout
@@ -64,8 +81,15 @@
 		android:text="Set time">
         <requestFocus />
         </EditText>
-
+	</LinearLayout>
     </LinearLayout>
+        <LinearLayout
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+	android:background="#ffffff"
+	android:paddingBottom="20dp"
+    android:layout_gravity="center_horizontal">
     <LinearLayout
         android:layout_width="fill_parent"
     android:layout_height="wrap_content"
@@ -74,12 +98,13 @@
 	android:layout_marginTop="30dp"
         >
         <TextView
+        android:fontFamily="sans-serif-light"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="35sp"
-        android:fontFamily="sans-serif-black"
-        android:textStyle="bold"
-        android:layout_marginLeft="5dp"
+        android:textSize="30sp"
+        android:background="#ffffff"
+        android:textColor="#2b7cc0"
+        android:paddingLeft="20dp"
         android:text="Buzzwords" />
         
 
@@ -88,13 +113,43 @@
             android:layout_width="45dp"
         	android:layout_height="45dp"
         	android:background="@android:color/transparent"
-        	android:layout_marginLeft="5dp"
-    		android:src="@drawable/ic_action_black"/>
+        	android:layout_marginLeft="15dp"
+    		android:src="@drawable/add"/>
+                <ImageButton
+            android:id="@+id/wordsdelete"
+            android:layout_width="45dp"
+        	android:layout_height="45dp"
+        	android:background="@android:color/transparent"
+        	android:layout_marginLeft="10dp"
+    		android:src="@drawable/deleteminus"/>
         </LinearLayout>
+        		<Spinner
+        android:id="@+id/spinner_op"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:entries="@array/word_choices"
+        android:layout_gravity="center_horizontal"
+        android:gravity="center_horizontal"
+        android:prompt="@string/default_word" />
+           
+                
+
 		<ListView
     	android:id="@android:id/list"
     	android:layout_width="wrap_content" 
     	android:layout_height="wrap_content"
     	android:drawSelectorOnTop="false"
     />
+		        <TextView
+		android:id="@+id/placeholdr"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="20sp"
+        android:background="#ffffff"
+        android:textColor="#000000"
+        android:paddingTop="10dp"
+        android:layout_gravity="center_horizontal"
+        android:text="Add some buzzwords to the list!" />
+		</LinearLayout>
+</LinearLayout>
 </LinearLayout>

@@ -24,6 +24,7 @@
         android:id="@+id/wordType"
         android:orientation="horizontal"
         android:layout_width="wrap_content"
+        android:checkedButton="@+id/incorp"
         android:layout_height="wrap_content" >
  
         <RadioButton
