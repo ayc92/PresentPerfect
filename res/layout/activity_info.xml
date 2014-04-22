@@ -27,11 +27,12 @@
         android:layout_marginRight="25dp"
         android:layout_gravity="center_horizontal|center_vertical"
         android:src="@drawable/skipb" />
-    <ImageView
+    <ImageButton
         android:id="@+id/playrec"
         android:layout_width="85dp"
         android:layout_height="85dp"
         android:layout_gravity="center_horizontal"
+        android:onClick="playback"
         android:src="@drawable/playlightblue" />
         <ImageView
         android:id="@+id/skipforward"

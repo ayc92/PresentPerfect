@@ -54,6 +54,9 @@ public class Info extends Activity {
 	ArrayList<String> good_items = new ArrayList<String>();
 	ArrayList<String> bad_items = new ArrayList<String>();
 	ArrayList<String> all_items = new ArrayList<String>();
+	
+	private MediaPlayer   mPlayer = null;
+	String filePath = null;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -90,6 +93,9 @@ public class Info extends Activity {
 //		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 //		spinner1.setAdapter(adapter);
 		spinner1.setOnItemSelectedListener(new SpinnerActivity1());
+		
+		Intent intent = getIntent();
+		filePath = intent.getExtras().getString("recordPath");
 	}
 
 	@Override
@@ -281,6 +287,19 @@ public void shareAction(View v){
 
 			// show it
 			alertDialog.show();
+
+	public void playback(View v) {
+		mPlayer = new MediaPlayer();
+        try {
+			File mFile = new File(filePath);
+	    	FileInputStream inputStream = new FileInputStream(mFile);
+	    	mPlayer.setDataSource(inputStream.getFD());
+	    	inputStream.close();
+            mPlayer.prepare();
+            mPlayer.start();
+        } catch (IOException e) {
+            Log.e("", "prepare() failed");
+        }
 	}
 
 }
