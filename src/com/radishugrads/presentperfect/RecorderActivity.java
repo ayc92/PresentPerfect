@@ -15,6 +15,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.Animation.AnimationListener;
@@ -81,20 +82,78 @@ public class RecorderActivity extends MotherBrain {
 		wordCounts = new HashMap<String, Integer>();
 		wordsPerMin = 0;
 		
+		// initialize button images to handle press and hold
+		recordButton.setOnTouchListener(new View.OnTouchListener() {
+			@Override
+			public boolean onTouch(View v, MotionEvent event) {
+				if (event.getAction() == android.view.MotionEvent.ACTION_DOWN) {
+					if (isRecording) {
+						recordButton.setImageResource(R.drawable.new_record_button_active_pressed);
+					} else {
+						recordButton.setImageResource(R.drawable.new_record_button_pressed);
+					}
+				} else {
+					if (isRecording || isPaused) {
+						recordButton.setImageResource(R.drawable.new_record_button);
+						handler.removeCallbacks(updateTime);
+						
+						Intent recordIntent = new Intent(v.getContext(), Info.class);
+						recordIntent.putExtra("recordPath", filePath);
+						startActivity(recordIntent);
+					} else {
+						if (animEnabled) {
+							slideButtons();
+							animEnabled = false;
+						}
+						recordButton.setImageResource(R.drawable.new_record_button_active);
+						// start timer/stopwatch
+						handler.postDelayed(updateTime, 800);
+						
+						// TODO: speech recognition
+					}
+					isRecording = !isRecording;
+				}
+				return false;
+			}
+		});
+		pauseButton.setOnTouchListener(new View.OnTouchListener() {
+			@Override
+			public boolean onTouch(View v, MotionEvent event) {
+				if (event.getAction() == android.view.MotionEvent.ACTION_DOWN) {
+					if (isRecording) {
+						pauseButton.setImageResource(R.drawable.new_pause_button_pressed);
+					} else {
+						pauseButton.setImageResource(R.drawable.new_play_button_pressed);
+					}
+				} else {
+					if (isRecording) {
+						pauseButton.setImageResource(R.drawable.new_play_button);
+						handler.removeCallbacks(updateTime);
+					} else {
+						pauseButton.setImageResource(R.drawable.new_pause_button);
+						handler.postDelayed(updateTime, 800);
+					}
+					isPaused = !isPaused;
+					isRecording = !isRecording;
+				}
+				return false;
+			}
+		});
+		
 		// setup animations
 		slideLeft = new TranslateAnimation (
 				Animation.RELATIVE_TO_SELF, 0.0f, Animation.RELATIVE_TO_SELF, -0.5f,
 				Animation.RELATIVE_TO_SELF, 0.0f, Animation.RELATIVE_TO_SELF, 0.0f
 				);
 		slideLeft.setFillEnabled(true);
-		slideLeft.setDuration(500);
+		slideLeft.setDuration(200);
 		slideLeft.setAnimationListener(new SlideListenerWithView((View) recordButton, -1));
 		
 		slideRight = new TranslateAnimation (
 				Animation.RELATIVE_TO_SELF, 0.0f, Animation.RELATIVE_TO_SELF, 0.5f,
 				Animation.RELATIVE_TO_SELF, 0.0f, Animation.RELATIVE_TO_SELF, 0.0f
 				);
-		slideRight.setDuration(500);
+		slideRight.setDuration(200);
 		slideRight.setAnimationListener(new SlideListenerWithView((View) pauseButton, 1));
 		
 		// set flags
@@ -129,6 +188,13 @@ public class RecorderActivity extends MotherBrain {
 	}
 
 	@Override
+	public void onBackPressed() {
+		Intent recordIntent = new Intent(this, RecList.class);
+		startActivity(recordIntent);
+		finish();
+	}
+	
+	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.mother_brain, menu);
@@ -151,48 +217,6 @@ public class RecorderActivity extends MotherBrain {
 	private void slideButtons() {
 		recordButton.startAnimation(slideLeft);
 		pauseButton.startAnimation(slideRight);
-	}
-	
-	public void onRecordPressed(View v) {
-		int vid = v.getId();
-		switch (vid) {
-			case R.id.begin_record:
-				// if the user ever presses this button twice consecutively, goto feedback screen
-				if (isRecording || isPaused) {
-					System.out.println("in here");
-					recordButton.setImageResource(R.drawable.ic_action_mic_black_large);
-					handler.removeCallbacks(updateTime);
-			        
-					Intent recordIntent = new Intent(this, Info.class);
-					recordIntent.putExtra("recordPath", filePath);
-					startActivity(recordIntent);
-				} else {
-					System.out.println("in here 2");
-					if (animEnabled) {
-						slideButtons();
-						animEnabled = false;
-					}
-					recordButton.setImageResource(R.drawable.ic_action_mic_black_large_active_2);
-					// start timer/stopwatch
-					handler.postDelayed(updateTime, 0);
-					
-					// TODO: speech recognition
-
-				}
-				isRecording = !isRecording;
-				break;
-			case R.id.pause_record:
-				if (isRecording) {
-					pauseButton.setImageResource(R.drawable.ic_action_play_black_large);
-					handler.removeCallbacks(updateTime);
-				} else {
-					pauseButton.setImageResource(R.drawable.ic_action_pause_black_large);
-					handler.postDelayed(updateTime, 0);
-				}
-				isPaused = !isPaused;
-				isRecording = !isRecording;
-				break;
-		}
 	}
 	
 	// runnable for updating time
