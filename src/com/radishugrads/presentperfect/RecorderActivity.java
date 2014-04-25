@@ -37,6 +37,10 @@ public class RecorderActivity extends MotherBrain {
 	Handler handler;
 	int timeInSecs;
 	
+	// current mic
+	Handler micHandler;
+	int currentMic;
+	
 	// animation
 	TranslateAnimation slideLeft;
 	TranslateAnimation slideRight;
@@ -88,14 +92,15 @@ public class RecorderActivity extends MotherBrain {
 			public boolean onTouch(View v, MotionEvent event) {
 				if (event.getAction() == android.view.MotionEvent.ACTION_DOWN) {
 					if (isRecording) {
-						recordButton.setImageResource(R.drawable.new_record_button_active_pressed);
+						setRecordButtonImage(R.drawable.new_record_button_active_pressed);
 					} else {
-						recordButton.setImageResource(R.drawable.new_record_button_pressed);
+						setRecordButtonImage(R.drawable.new_record_button_pressed);
 					}
 				} else {
 					if (isRecording || isPaused) {
-						recordButton.setImageResource(R.drawable.new_record_button);
+						setRecordButtonImage(R.drawable.new_record_button);
 						handler.removeCallbacks(updateTime);
+						handler.removeCallbacks(flashMic);
 						
 						Intent recordIntent = new Intent(v.getContext(), Info.class);
 						recordIntent.putExtra("recordPath", filePath);
@@ -105,9 +110,10 @@ public class RecorderActivity extends MotherBrain {
 							slideButtons();
 							animEnabled = false;
 						}
-						recordButton.setImageResource(R.drawable.new_record_button_active);
+						setRecordButtonImage(R.drawable.new_record_button_active);
 						// start timer/stopwatch
 						handler.postDelayed(updateTime, 800);
+						handler.postDelayed(flashMic, 200);
 						
 						// TODO: speech recognition
 					}
@@ -129,9 +135,11 @@ public class RecorderActivity extends MotherBrain {
 					if (isRecording) {
 						pauseButton.setImageResource(R.drawable.new_play_button);
 						handler.removeCallbacks(updateTime);
+						handler.removeCallbacks(flashMic);
 					} else {
 						pauseButton.setImageResource(R.drawable.new_pause_button);
 						handler.postDelayed(updateTime, 800);
+						handler.postDelayed(flashMic, 200);
 					}
 					isPaused = !isPaused;
 					isRecording = !isRecording;
@@ -146,14 +154,14 @@ public class RecorderActivity extends MotherBrain {
 				Animation.RELATIVE_TO_SELF, 0.0f, Animation.RELATIVE_TO_SELF, 0.0f
 				);
 		slideLeft.setFillEnabled(true);
-		slideLeft.setDuration(200);
+		slideLeft.setDuration(300);
 		slideLeft.setAnimationListener(new SlideListenerWithView((View) recordButton, -1));
 		
 		slideRight = new TranslateAnimation (
 				Animation.RELATIVE_TO_SELF, 0.0f, Animation.RELATIVE_TO_SELF, 0.5f,
 				Animation.RELATIVE_TO_SELF, 0.0f, Animation.RELATIVE_TO_SELF, 0.0f
 				);
-		slideRight.setDuration(200);
+		slideRight.setDuration(300);
 		slideRight.setAnimationListener(new SlideListenerWithView((View) pauseButton, 1));
 		
 		// set flags
@@ -164,6 +172,9 @@ public class RecorderActivity extends MotherBrain {
 		// setup timer
 		handler = new Handler();
 		timeInSecs = 0;
+		
+		// setup current mic
+		currentMic = R.drawable.new_record_button;
 		
 		// setup sound recorder and audio track
 		int bufferSize = AudioRecord.getMinBufferSize(SAMPLE_RATE, AudioFormat.CHANNEL_IN_MONO,
@@ -214,9 +225,16 @@ public class RecorderActivity extends MotherBrain {
 	    }
 	}
 	
+	// run button slide animation
 	private void slideButtons() {
 		recordButton.startAnimation(slideLeft);
 		pauseButton.startAnimation(slideRight);
+	}
+	
+	// update button image and also set current button variable
+	private void setRecordButtonImage(int resourceId) {
+		recordButton.setImageResource(resourceId);
+		currentMic = resourceId;
 	}
 	
 	// runnable for updating time
@@ -225,6 +243,21 @@ public class RecorderActivity extends MotherBrain {
 			timeInSecs += 1;
 			timeDisplay.setText(String.format("%1$02d:%2$02d", timeInSecs / 60, timeInSecs % 60));
 			handler.postDelayed(this, 1000);
+		}
+	};
+	
+	// runnable for indicating record mode (flashing)
+	private Runnable flashMic = new Runnable() {
+		public void run() {
+			switch(currentMic) {
+			case R.drawable.new_record_button:
+				setRecordButtonImage(R.drawable.new_record_button_active);
+				break;
+			case R.drawable.new_record_button_active:
+				setRecordButtonImage(R.drawable.new_record_button);
+				break;
+			}
+			handler.postDelayed(this, 800);
 		}
 	};
 	
