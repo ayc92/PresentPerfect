@@ -176,6 +176,7 @@ public class OptionsActivity extends ListActivity {
 								all_items.add(word);
 								if (currList == 0){
 									items.add(word);
+									Log.d("OOOO", "ADDED TO ITEMS");
 								}
 								Log.d("OOOO", "POST ADD PRE NOTIFY");
 								//((ListView)findViewById(R.id.list)).getAdapter().notifyDataSetChanged();

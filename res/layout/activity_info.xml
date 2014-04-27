@@ -12,7 +12,7 @@
 <LinearLayout
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     android:layout_marginLeft="20dp"
     android:layout_marginRight="20dp"
     android:layout_gravity="center_horizontal">
@@ -31,7 +31,7 @@
         android:layout_gravity="center_horizontal|center_vertical"
         android:background="@android:color/transparent"
         android:src="@drawable/skipb" />
-    <ImageButton
+    <ImageView
         android:id="@+id/playrec"
         android:layout_width="85dp"
         android:layout_height="85dp"
@@ -82,10 +82,10 @@
     android:orientation="horizontal"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="#ffffff"
+    android:background="@drawable/recorder_bg"
     android:clickable="true"
     android:onClick="toggle_contents"
-    android:layout_marginTop="50dp">
+    android:layout_marginTop="30dp">
 
 <TextView
     android:id="@+id/wordcounts"
@@ -94,7 +94,7 @@
         android:layout_weight="1"
         android:layout_height="wrap_content"
         android:textSize="30sp"
-        android:background="#ffffff"
+        android:background="@drawable/recorder_bg"
         android:textColor="#2b7cc0"
         android:paddingTop="20dp"
         android:paddingBottom="20dp"
@@ -122,13 +122,12 @@
         android:layout_gravity="center_horizontal"
         android:gravity="center_horizontal"
         android:prompt="@string/default_word" />
-		<ListView
-    	android:id="@+id/listcount"
-    	android:layout_width="wrap_content" 
-    	android:layout_height="wrap_content"
-    	android:drawSelectorOnTop="false"
-    	android:background="#ffffff"
-    />
+		<LinearLayout
+    android:id="@+id/countList"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+    </LinearLayout>
 	</LinearLayout>
 	<LinearLayout
     	android:orientation="horizontal"
@@ -137,7 +136,7 @@
     	android:clickable="true"
     	android:onClick="toggle_contents2"
     	android:layout_marginTop="30dp"
-    	android:background="#ffffff"
+    	android:background="@drawable/recorder_bg"
     	android:layout_gravity="center_horizontal">
 		<TextView
     	android:id="@+id/comments"
@@ -146,7 +145,7 @@
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:textSize="30sp"
-        android:background="#ffffff"
+        android:background="@drawable/recorder_bg"
         android:textColor="#2b7cc0"
         android:paddingTop="20dp"
         android:paddingBottom="20dp"
@@ -160,14 +159,13 @@
         android:layout_gravity="center_vertical|right"
         android:src="@drawable/arrowdownblue" />
 		</LinearLayout>
-		<ListView
-    	android:id="@+id/commentlist"
-    	android:layout_width="wrap_content" 
-    	android:layout_height="wrap_content"
-    	android:drawSelectorOnTop="false"
-    	android:visibility="gone"
-    	android:background="#ffffff"
-    />
+		<LinearLayout
+    android:id="@+id/commentlist"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:visibility="gone"
+    android:layout_height="wrap_content">
+    </LinearLayout>
 		<LinearLayout
     	android:orientation="horizontal"
     	android:layout_width="match_parent"
@@ -175,7 +173,7 @@
     	android:clickable="true"
     	android:onClick="toggle_contents3"
     	android:layout_marginTop="30dp"
-    	android:background="#ffffff"
+    	android:background="@drawable/recorder_bg"
     	android:layout_gravity="center_horizontal">
 		<TextView
     	android:id="@+id/notes"
@@ -184,7 +182,7 @@
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:textSize="30sp"
-        android:background="#ffffff"
+        android:background="@drawable/recorder_bg"
         android:textColor="#2b7cc0"
         android:paddingTop="20dp"
         android:paddingBottom="20dp"

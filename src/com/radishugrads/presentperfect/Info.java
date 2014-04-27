@@ -40,7 +40,7 @@ public class Info extends Activity {
 	Object recording;
 	
 	ListView listcount;
-	ListView comment_view;
+	LinearLayout comment_view;
 	boolean wordVisib;
 	boolean commentVisib;
 	boolean notesVisib;
@@ -51,7 +51,7 @@ public class Info extends Activity {
 	ArrayList<String> chosen_contacts;
 	wordCountAdapter adapter;
 	String contacts[] = {"Marie Antoinette", "George Orwell", "Clifford", "my mom"};
-	String s2[] = {"work a little more on your enthusiasm. good use of stories", "7/10 needs more oomph"};
+	String comments[] = {"work a little more on your enthusiasm. good use of stories", "7/10 needs more oomph"};
 	Spinner spinner1;
 	LinearLayout firstPanel;
 	LinearLayout notes;
@@ -84,11 +84,12 @@ public class Info extends Activity {
 		chosen_contacts = new ArrayList<String>();
 		firstPanel = (LinearLayout) findViewById(R.id.firstPanel);
 		notes = (LinearLayout) findViewById(R.id.thirdPanel);
-		listcount = (ListView) findViewById(R.id.listcount);
-		adapter = new wordCountAdapter(counts, this);
-		listcount.setAdapter(adapter);
-		comment_view = (ListView) findViewById(R.id.commentlist);
-		comment_view.setAdapter(new ArrayAdapter<String> (this, android.R.layout.simple_list_item_1, s2));
+		//listcount = (ListView) findViewById(R.id.listcount);
+		//adapter = new wordCountAdapter(counts, this);
+		//listcount.setAdapter(adapter);
+		//comment_view = (ListView) findViewById(R.id.commentlist);
+		//comment_view.setAdapter(new ArrayAdapter<String> (this, android.R.layout.simple_list_item_1, s2));
+		comment_view = (LinearLayout) findViewById(R.id.commentlist);
 		arrow1 = (ImageView) findViewById(R.id.imageView2);
 		arrow2 = (ImageView) findViewById(R.id.imageView3);
 		arrow3 = (ImageView) findViewById(R.id.imageView4);
@@ -97,7 +98,7 @@ public class Info extends Activity {
 //		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 //		spinner1.setAdapter(adapter);
 		spinner1.setOnItemSelectedListener(new SpinnerActivity1());
-		
+		updateList_comments();
 //		Intent intent = getIntent();
 //		filePath = intent.getExtras().getString("recordPath");
 		filePath = getFilesDir() + "/audiotest.3gp";
@@ -227,15 +228,18 @@ public class SpinnerActivity1 extends Activity implements OnItemSelectedListener
 	    	if (selected.equals("All")){
 				counts.clear();
 				counts.addAll(all_items);
-				adapter.notifyDataSetChanged();
+				//adapter.notifyDataSetChanged();
+				updateList();
 	    	} else if (selected.equals("Avoid")) {
 				counts.clear();
 				counts.addAll(bad_items);
-				adapter.notifyDataSetChanged();
+				//adapter.notifyDataSetChanged();
+				updateList();
 	    	} else if (selected.equals("Incorporate")) {
 				counts.clear();
 				counts.addAll(good_items);
-				adapter.notifyDataSetChanged();
+				//adapter.notifyDataSetChanged();
+				updateList();
 	    	}
 	    }
 
@@ -307,6 +311,42 @@ public class SpinnerActivity1 extends Activity implements OnItemSelectedListener
         } catch (IOException e) {
             Log.e("", "prepare() failed");
         }
+	}
+	
+	public void updateList(){
+		LinearLayout countList = (LinearLayout) findViewById(R.id.countList);
+		countList.removeAllViews();
+		LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+		for (int i = 0; i < counts.size(); i++){
+			View view;
+		    Log.d("OOOO", "INNNNN"); 
+		    view = inflater.inflate(R.layout.wordcountlist, null);
+		    Log.d("OOOO", "INNNN222");
+		    TextView listNum = (TextView)view.findViewById(R.id.numbercount); 
+		    listNum.setText(i+" "); 
+		    Log.d("OOOO", "IN 33333");
+		    TextView listWord = (TextView)view.findViewById(R.id.wordofnum); 
+		    listWord.setText(counts.get(i));
+		    countList.addView(view);
+		}
+		  
+	}
+	public void updateList_comments(){
+		comment_view.removeAllViews();
+		LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+		for (int i = 0; i < comments.length; i++){
+			View view;
+		    Log.d("OOOO", "INNNNN"); 
+		    view = inflater.inflate(R.layout.commentslist, null);
+		    Log.d("OOOO", "INNNN222");
+		    TextView listUser = (TextView)view.findViewById(R.id.commentuser); 
+		    listUser.setText("Bob says"); 
+		    Log.d("OOOO", "IN 33333");
+		    TextView listComment = (TextView)view.findViewById(R.id.commenttext); 
+		    listComment.setText(comments[i]);
+		    comment_view.addView(view);
+		}
+		  
 	}
 
 }
