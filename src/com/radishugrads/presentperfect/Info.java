@@ -4,22 +4,23 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 
-import android.media.MediaPlayer;
-import android.os.Bundle;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
+import android.media.MediaPlayer;
+import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
+import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -27,13 +28,12 @@ import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.AdapterView.OnItemSelectedListener;
 
 public class Info extends Activity {
-	int actual_hour;
 	int actual_min;
-	int target_hour;
+	int actual_sec;
 	int target_min;
+	int target_sec;
 	int wpm;
 	TextView time_f;
 	TextView speed_f;
@@ -47,7 +47,8 @@ public class Info extends Activity {
 	ImageView arrow1;
 	ImageView arrow2;
 	ImageView arrow3;
-	ArrayList<String> counts;
+	ArrayList<String> words;
+	ArrayList<Integer> counts;
 	ArrayList<String> chosen_contacts;
 	wordCountAdapter adapter;
 	String contacts[] = {"Marie Antoinette", "George Orwell", "Clifford", "my mom"};
@@ -55,24 +56,45 @@ public class Info extends Activity {
 	Spinner spinner1;
 	LinearLayout firstPanel;
 	LinearLayout notes;
-	ArrayList<String> good_items = new ArrayList<String>();
-	ArrayList<String> bad_items = new ArrayList<String>();
-	ArrayList<String> all_items = new ArrayList<String>();
+	ArrayList<String> good_items;
+	ArrayList<String> bad_items;
+	ArrayList<String> all_items;
+	ArrayList<Integer> good_counts;
+	ArrayList<Integer> bad_counts;
+	ArrayList<Integer> all_counts;
+	Bundle data;
 	
-	private MediaPlayer   mPlayer = null;
+	private MediaPlayer mPlayer = null;
 	String filePath = null;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_info);
-		tempHardcode();
+		data = getIntent().getExtras();
+		actual_min = data.getInt("cur_time") / 60;
+		actual_sec = data.getInt("cur_time") % 60;
+		target_min = data.getInt("time_limit") / 60;
+		target_sec = data.getInt("time_limit") % 60;
+		wpm = data.getInt("wpm");
+		good_items = new ArrayList<String>(((HashMap<String, Integer>) data.getSerializable("good")).keySet());
+		good_counts = new ArrayList<Integer>(((HashMap<String, Integer>) data.getSerializable("good")).values());
+		
+		bad_items = new ArrayList<String>(((HashMap<String, Integer>) data.getSerializable("bad")).keySet());
+		bad_counts = new ArrayList<Integer>(((HashMap<String, Integer>) data.getSerializable("bad")).values());
+		
+		all_items = new ArrayList<String>(((HashMap<String, Integer>) data.getSerializable("all")).keySet());
+		all_counts = new ArrayList<Integer>(((HashMap<String, Integer>) data.getSerializable("all")).values());
+		
+		words = all_items;
+		counts = all_counts;
+		
 		time_f = (TextView) findViewById(R.id.speechtime);
 		speed_f = (TextView) findViewById(R.id.wordspermin);
-		if (actual_hour > target_hour || (actual_hour == target_hour && actual_min > target_min)){
+		if (actual_min > target_min || (actual_min == target_min && actual_sec > target_sec)){
 			time_f.setBackgroundColor(Color.parseColor("#D22027"));
 		}
-		time_f.setText("Speech time: " + actual_hour + ":" + actual_min);
+		time_f.setText("Speech time: " + actual_min + ":" + actual_sec);
 		if (wpm > 150 || wpm < 130){
 			speed_f.setBackgroundColor(Color.parseColor("#D22027"));
 		}
@@ -84,23 +106,13 @@ public class Info extends Activity {
 		chosen_contacts = new ArrayList<String>();
 		firstPanel = (LinearLayout) findViewById(R.id.firstPanel);
 		notes = (LinearLayout) findViewById(R.id.thirdPanel);
-		//listcount = (ListView) findViewById(R.id.listcount);
-		//adapter = new wordCountAdapter(counts, this);
-		//listcount.setAdapter(adapter);
-		//comment_view = (ListView) findViewById(R.id.commentlist);
-		//comment_view.setAdapter(new ArrayAdapter<String> (this, android.R.layout.simple_list_item_1, s2));
 		comment_view = (LinearLayout) findViewById(R.id.commentlist);
 		arrow1 = (ImageView) findViewById(R.id.imageView2);
 		arrow2 = (ImageView) findViewById(R.id.imageView3);
 		arrow3 = (ImageView) findViewById(R.id.imageView4);
 		spinner1 = (Spinner) findViewById(R.id.spinner1);
-//		ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this, R.array.word_choices, android.R.layout.simple_spinner_item);
-//		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-//		spinner1.setAdapter(adapter);
 		spinner1.setOnItemSelectedListener(new SpinnerActivity1());
 		updateList_comments();
-//		Intent intent = getIntent();
-//		filePath = intent.getExtras().getString("recordPath");
 		filePath = getFilesDir() + "/audiotest.3gp";
 	}
 
@@ -118,30 +130,27 @@ public class Info extends Activity {
 		finish();
 	}
 	
-	public void tempHardcode(){
-		actual_hour = 0;
-		actual_min = 14;
-		target_hour = 0;
-		target_min = 13;
-		wpm = 120;
-		counts = new ArrayList<String>();
-		counts.add("like");
-		counts.add("um");
-		counts.add("user generated content");
-		all_items = new ArrayList<String>();
-		all_items.add("like");
-		all_items.add("um");
-		all_items.add("user generated content");
-	}
+//	public void tempHardcode(){
+//		actual_min = 0;
+//		actual_sec = 14;
+//		target_min = 0;
+//		target_sec = 13;
+//		wpm = 120;
+//		counts = new ArrayList<String>();
+//		counts.add("like");
+//		counts.add("um");
+//		counts.add("user generated content");
+//		all_items = new ArrayList<String>();
+//		all_items.add("like");
+//		all_items.add("um");
+//		all_items.add("user generated content");
+//	}
+	
 	public void toggle_contents(View v){
 		if (wordVisib){
-//			listcount.setVisibility(View.GONE);
-//			spinner1.setVisibility(View.GONE);
 			firstPanel.setVisibility(View.GONE);
 			arrow1.setImageResource(R.drawable.arrowdownblue);
 		} else {
-//	      listcount.setVisibility(View.VISIBLE);
-//	      spinner1.setVisibility(View.VISIBLE);
 			firstPanel.setVisibility(View.VISIBLE);
 	      arrow1.setImageResource(R.drawable.arrowupblue);
 		}
@@ -201,11 +210,11 @@ public class Info extends Activity {
 		public View getView(final int position, View convertView, ViewGroup parent) {
 		    View view;
 		    Log.d("OOOO", "INNNNN");
-		        LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE); 
-		        view = inflater.inflate(R.layout.wordcountlist, null);
-		        Log.d("OOOO", "INNNN222");
+	        LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE); 
+	        view = inflater.inflate(R.layout.wordcountlist, null);
+	        Log.d("OOOO", "INNNN222");
 		    TextView listNum = (TextView)view.findViewById(R.id.numbercount); 
-		    listNum.setText(position+" "); 
+		    listNum.setText(position+""); 
 		    Log.d("OOOO", "IN 33333");
 		    TextView listWord = (TextView)view.findViewById(R.id.wordofnum); 
 		    listWord.setText(list.get(position)); 
@@ -213,32 +222,25 @@ public class Info extends Activity {
 		} 
 		}
 	
-	public void hardcoded(){
-		counts = new ArrayList<String>();
-		counts.add("like");
-		counts.add("um");
-		counts.add("user generated content");
-	}
 	
 public class SpinnerActivity1 extends Activity implements OnItemSelectedListener {
 	    
 	    public void onItemSelected(AdapterView<?> parent, View view, 
 	            int pos, long id) {
 	    	String selected = parent.getItemAtPosition(pos).toString();
+	    	words.clear();
+	    	counts.clear();
 	    	if (selected.equals("All")){
-				counts.clear();
-				counts.addAll(all_items);
-				//adapter.notifyDataSetChanged();
+				words.addAll(all_items);
+				counts.addAll(all_counts);
 				updateList();
 	    	} else if (selected.equals("Avoid")) {
-				counts.clear();
-				counts.addAll(bad_items);
-				//adapter.notifyDataSetChanged();
+				words.addAll(bad_items);
+				counts.addAll(bad_counts);
 				updateList();
 	    	} else if (selected.equals("Incorporate")) {
-				counts.clear();
-				counts.addAll(good_items);
-				//adapter.notifyDataSetChanged();
+				words.addAll(good_items);
+				counts.addAll(good_counts);
 				updateList();
 	    	}
 	    }
@@ -323,10 +325,10 @@ public class SpinnerActivity1 extends Activity implements OnItemSelectedListener
 		    view = inflater.inflate(R.layout.wordcountlist, null);
 		    Log.d("OOOO", "INNNN222");
 		    TextView listNum = (TextView)view.findViewById(R.id.numbercount); 
-		    listNum.setText(i+" "); 
+		    listNum.setText("" + counts.get(i));
 		    Log.d("OOOO", "IN 33333");
 		    TextView listWord = (TextView)view.findViewById(R.id.wordofnum); 
-		    listWord.setText(counts.get(i));
+		    listWord.setText(words.get(i));
 		    countList.addView(view);
 		}
 		  

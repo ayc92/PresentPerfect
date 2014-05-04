@@ -7,6 +7,7 @@
     android:background="@color/background"
     tools:context=".ExpandableListFragment" >
     
+    <!--
     <LinearLayout 
         android:id="@+id/top_group"
         android:layout_width="fill_parent"
@@ -17,7 +18,6 @@
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:layout_marginBottom="3dp">
-        
         
 		<TextView
 		    android:id="@+id/pitches"
@@ -31,10 +31,10 @@
        
     </RelativeLayout>
     </LinearLayout>
+    -->
 
     	<ExpandableListView
     	    android:id="@+id/lvExp"
-    	    android:layout_below="@+id/top_group"
     	    android:layout_above="@+id/bottom_bar"
     	    android:layout_width="fill_parent"
     	    android:layout_height="fill_parent"
@@ -52,7 +52,7 @@
     	    android:layout_alignParentBottom="true"
     	    android:divider="@drawable/custom_divider"
     	    android:showDividers="middle"
-    	    android:dividerPadding="5dp">
+    	    android:dividerPadding="2dp">
     
     
     	    <Button

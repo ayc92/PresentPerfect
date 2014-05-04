@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import android.content.Context;
 import android.content.Intent;
 import android.media.AudioFormat;
 import android.media.AudioManager;
@@ -28,6 +29,8 @@ import android.widget.TextView;
 
 public class RecorderActivity extends MotherBrain {
 	
+	Context context;
+	
 	// views
 	RelativeLayout recordView;
 	ImageButton recordButton;
@@ -36,12 +39,14 @@ public class RecorderActivity extends MotherBrain {
 	
 	// params and default params
 	Bundle params;
-	private final boolean IS_STOPWATCH = true;
+	private final boolean IS_TIMER = true;
+	private final int TIME_LIMIT = 5;
 	
 	// time displays (default is stopwatch)
 	Handler handler;
-	boolean isStopwatch;
+	boolean isTimer;
 	int timeInSecs;
+	int timeLimit;
 	
 	// current mic
 	Handler micHandler;
@@ -72,7 +77,9 @@ public class RecorderActivity extends MotherBrain {
     private MediaPlayer   mPlayer = null;
 	
 	// data variables
-	HashMap<String, Integer> wordCounts;
+	HashMap<String, Integer> goodWordCounts;
+	HashMap<String, Integer> badWordCounts;
+	HashMap<String, Integer> allWordCounts;
 	int wordsPerMin;
 	
 	@Override
@@ -80,11 +87,50 @@ public class RecorderActivity extends MotherBrain {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.recording);
 		
+		context = this;
+		
 		// format action bar
 		formatActionBar("Recorder");
 		
-		// set default params
-		params = new Bundle();
+		// get params
+		params = getIntent().getExtras();
+		if (params != null) {
+			ArrayList<String> good_items = params.getStringArrayList("good_items");
+			ArrayList<String> bad_items = params.getStringArrayList("bad_items");
+			ArrayList<String> all_items = params.getStringArrayList("all_items");
+			for (String str : good_items) {
+				goodWordCounts.put(str, 0);
+			}
+			for (String str : bad_items) {
+				badWordCounts.put(str, 0);
+			}
+			for (String str : all_items) {
+				allWordCounts.put(str, 0);
+			}
+			isTimer = params.getBoolean("timer");
+			if (isTimer) {
+				timeInSecs = params.getInt("min") * 60;
+				timeLimit = timeInSecs;
+			} else {
+				timeInSecs = 0;
+				timeLimit = params.getInt("min") * 60;
+			}
+		} else {
+			// initialize params first
+			params = new Bundle();
+			params.putStringArrayList("good_items", new ArrayList<String>());
+			params.putStringArrayList("bad_items", new ArrayList<String>());
+			params.putStringArrayList("all_items", new ArrayList<String>());
+			params.putBoolean("timer", true);
+			params.putInt("min", TIME_LIMIT);
+			
+			goodWordCounts = new HashMap<String, Integer>();
+			badWordCounts = new HashMap<String, Integer>();
+			allWordCounts = new HashMap<String, Integer>();
+			isTimer = IS_TIMER;
+			timeInSecs = TIME_LIMIT * 60;
+			timeLimit = timeInSecs;
+		}
 		
 		
 		// get needed views
@@ -92,9 +138,11 @@ public class RecorderActivity extends MotherBrain {
 		pauseButton = (ImageButton) findViewById(R.id.pause_record);
 		timeDisplay = (TextView) findViewById(R.id.time_display);
 		
+		timeDisplay.setText(String.format("%1$02d:%2$02d", timeInSecs / 60, timeInSecs % 60));
+		
 		// initialize data vars
-		wordCounts = new HashMap<String, Integer>();
-		wordsPerMin = 0;
+//		wordCounts = new HashMap<String, Integer>();
+//		wordsPerMin = 0;
 		
 		// initialize button images to handle press and hold
 		recordButton.setOnTouchListener(new View.OnTouchListener() {
@@ -109,12 +157,7 @@ public class RecorderActivity extends MotherBrain {
 				} else {
 					if (isRecording || isPaused) {
 						setRecordButtonImage(R.drawable.new_record_button);
-						handler.removeCallbacks(updateTime);
-						handler.removeCallbacks(flashMic);
-						
-						Intent recordIntent = new Intent(v.getContext(), Info.class);
-						recordIntent.putExtra("recordPath", filePath);
-						startActivity(recordIntent);
+						sendFeedbackIntent();
 					} else {
 						if (animEnabled) {
 							slideButtons();
@@ -181,7 +224,9 @@ public class RecorderActivity extends MotherBrain {
 		
 		// setup timer
 		handler = new Handler();
-		timeInSecs = 0;
+		
+		// words per min
+		wordsPerMin = 0;
 		
 		// setup current mic
 		currentMic = R.drawable.new_record_button;
@@ -228,6 +273,7 @@ public class RecorderActivity extends MotherBrain {
 	    switch (item.getItemId()) {
 	        case R.id.action_settings:
 	        	Intent recordIntent = new Intent(this, OptionsActivity.class);
+	        	recordIntent.putExtras(params);
 	    		startActivity(recordIntent);
 	            return true;
 	        default:
@@ -235,11 +281,27 @@ public class RecorderActivity extends MotherBrain {
 	    }
 	}
 	
-	// initialize default params
-	private void setDefaultParams() {
-		params.putBoolean("isStopwatch", true);
-		params.putStringArrayList("incorporat", new ArrayList<String>());
-		params.putStringArrayList("avoid", new ArrayList<String>());
+	// remove callbacks and create new intent
+	private void sendFeedbackIntent() {
+		handler.removeCallbacks(updateTime);
+		handler.removeCallbacks(flashMic);
+		
+		Intent recordIntent = new Intent(context, Info.class);
+		recordIntent.putExtra("recordPath", filePath);
+		Bundle data = new Bundle();
+		if (!isTimer) {
+			data.putBoolean("over_time", timeInSecs > timeLimit);
+		} else {
+			data.putBoolean("over_time", timeInSecs <= 0);
+		}
+		data.putSerializable("good", goodWordCounts);
+		data.putSerializable("bad", badWordCounts);
+		data.putSerializable("all", allWordCounts);
+		data.putSerializable("wpm", wordsPerMin);
+		data.putInt("cur_time", timeInSecs);
+		data.putInt("time_limit", timeLimit);
+		recordIntent.putExtras(data);
+		startActivity(recordIntent);
 	}
 	
 	// run button slide animation
@@ -257,7 +319,16 @@ public class RecorderActivity extends MotherBrain {
 	// runnable for updating time
 	private Runnable updateTime = new Runnable() {
 		public void run() {
-			timeInSecs += 1;
+			if (isTimer) {
+				if (timeInSecs == 0) {
+					setRecordButtonImage(R.drawable.new_record_button);
+					sendFeedbackIntent();
+				} else {
+					timeInSecs -= 1;
+				}
+			} else {
+				timeInSecs += 1;
+			}
 			timeDisplay.setText(String.format("%1$02d:%2$02d", timeInSecs / 60, timeInSecs % 60));
 			handler.postDelayed(this, 1000);
 		}
