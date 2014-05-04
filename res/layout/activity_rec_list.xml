@@ -3,62 +3,78 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     android:background="@color/background"
     tools:context=".ExpandableListFragment" >
     
-    <RelativeLayout
+    <LinearLayout 
         android:id="@+id/top_group"
         android:layout_width="fill_parent"
-        android:paddingLeft="5dip"
-        android:paddingRight="5dip"
-        android:layout_height="50dip">
+        android:layout_height="50dip"
+        android:background="@color/mod_black" >
         
-       <ImageButton
-        android:id="@+id/add"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/add"
-        android:background="@color/background"
-        android:text="Button"
-        android:layout_centerVertical="true"
-        android:layout_alignParentLeft="true"
-        android:onClick="addClick" />
-       
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_marginBottom="3dp">
+        
+        
 		<TextView
-	        android:id="@+id/pitches"
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:text="My Pitches"
-	        android:gravity="center_horizontal"
-	        android:layout_centerVertical="true"
-	        android:layout_centerInParent="true"
-        	android:textSize="25sp" />
-         
-       <ImageButton 
-          	android:id="@+id/removeParent"
-          	android:layout_width="wrap_content"
-        	android:layout_height="wrap_content"
-        	android:background="@color/background"
-        	android:src="@drawable/remove"
-        	android:layout_centerVertical="true"
-            android:layout_alignParentRight="true"
-            android:onClick="startRemove"
-            /> 
+		    android:id="@+id/pitches"
+		    android:layout_width="fill_parent"
+		    android:layout_height="fill_parent"
+		    android:layout_centerVertical="true"
+		    android:background="@color/background"
+		    android:gravity="center_horizontal"
+		    android:text="My Pitches"
+		    android:textSize="25sp" />
        
     </RelativeLayout>
+    </LinearLayout>
 
-    <ExpandableListView
-        android:id="@+id/lvExp"
-        android:layout_below="@+id/top_group"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:background="@color/background" >
+    	<ExpandableListView
+    	    android:id="@+id/lvExp"
+    	    android:layout_below="@+id/top_group"
+    	    android:layout_above="@+id/bottom_bar"
+    	    android:layout_width="fill_parent"
+    	    android:layout_height="fill_parent"
+    	    android:divider="@color/mod_black"
+    	    android:dividerHeight="2dp" >
        
-    </ExpandableListView>
-
+   		</ExpandableListView>
+   		
+    	<LinearLayout
+    	    android:id="@+id/bottom_bar"
+    	    android:layout_width="fill_parent"
+    	    android:layout_height="wrap_content"
+    	    android:background="@drawable/border"
+    	    android:orientation="horizontal"
+    	    android:layout_alignParentBottom="true"
+    	    android:divider="@drawable/custom_divider"
+    	    android:showDividers="middle"
+    	    android:dividerPadding="5dp">
+    
+    
+    	    <Button
+    	        android:id="@+id/addProject" 
+    	        android:layout_height="fill_parent"
+    	        android:layout_width="0dp"
+    	        android:layout_weight="1"
+    	        android:text="Add"
+    	        android:gravity="center"
+    	        android:textColor="@color/background"
+    	        android:background="@color/mod_black"/>
+    	    
+    	    <Button
+    	        android:id="@+id/removeParent" 
+    	        android:layout_height="fill_parent"
+    	        android:layout_width="0dp"
+    	        android:layout_weight="1"
+    	        android:text="Remove"
+    	        android:gravity="center"
+    	        android:textColor="@color/background"
+    	        android:background="@color/mod_black"/>
+    	</LinearLayout>
+   		
                 
 </RelativeLayout>
