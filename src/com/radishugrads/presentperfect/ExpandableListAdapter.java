@@ -2,13 +2,15 @@ package com.radishugrads.presentperfect;
 
 import java.util.HashMap;
 import java.util.List;
- 
+
 import android.content.Context;
 import android.graphics.Typeface;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
+import android.widget.ImageButton;
 import android.widget.TextView;
  
 /*
@@ -19,17 +21,21 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
  
     private Context _context;
     private List<String> _listDataHeader; // header titles
+    ExpandableListFragment myList;
+    private View lastView;
     // child data in format of header title, child title
     private HashMap<String, List<String>> _listDataChild;
     private boolean childRemoveOn = false;
     private boolean parentRemoveOn = false;
     private boolean changedLayout = false;
+
  
-    public ExpandableListAdapter(Context context, List<String> listDataHeader,
+    public ExpandableListAdapter(ExpandableListFragment list, Context context, List<String> listDataHeader,
             HashMap<String, List<String>> listChildData) {
         this._context = context;
         this._listDataHeader = listDataHeader;
         this._listDataChild = listChildData;
+        this.myList = list;
     }
     
     public void setRemoveChild(boolean remove) {
@@ -40,8 +46,8 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
     	parentRemoveOn = remove;
     }
     
-    public void changedLayout(boolean yes_or_no) {
-    	changedLayout = yes_or_no; 
+    public void changedLayout(boolean b) {
+    	changedLayout = b;
     }
     
     @Override
@@ -64,7 +70,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
         if (convertView == null || changedLayout) {
             LayoutInflater infalInflater = (LayoutInflater) this._context
                     .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            if (childRemoveOn && !(childText.equals(RecList.ADD_BUTTON))) { //Remove option selected
+            if (childRemoveOn) { //Remove option selected
                 convertView = infalInflater.inflate(R.layout.list_item_rem, null);
             } else { //Remove option not selected
             	convertView = infalInflater.inflate(R.layout.list_item, null);
@@ -115,7 +121,31 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
                 .findViewById(R.id.lblListHeader);
         lblListHeader.setTypeface(null, Typeface.BOLD);
         lblListHeader.setText(headerTitle);
- 
+        lastView = convertView;
+        if (!(myList.viewTable.containsKey(convertView))) {
+        	myList.viewTable.put(convertView, groupPosition);
+        }
+    	ImageButton removeProj = (ImageButton) convertView.findViewById(R.id.removeProject);
+    	ImageButton addRec = (ImageButton) convertView.findViewById(R.id.addRec);
+        if (parentRemoveOn && removeProj != null && !(removeProj.callOnClick())) {
+        	removeProj.setFocusable(false);
+        	removeProj.setOnClickListener(new OnClickListener() {
+        		View myView = lastView;
+        		@Override
+        		public void onClick(View v) {
+        			myList.deleteGroup(myView);
+        		}
+        	});
+        } else if (addRec != null) {
+        	addRec.setFocusable(false);
+        	addRec.setOnClickListener(new OnClickListener() {
+	        	View myView = lastView;
+	        	@Override
+	        	public void onClick(View v) {
+	        		myList.addRec(myView);
+	        	}
+	        });
+        }
         return convertView;
     }
  

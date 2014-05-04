@@ -9,18 +9,43 @@
         android:layout_alignParentTop="true"
         android:layout_centerVertical="true"
         android:layout_width="fill_parent"
-        android:layout_height="75dp" >
+        android:layout_height="60dp" >
     </FrameLayout>
     
     <FrameLayout
-        android:id="@+id/buttons_container"
+        android:id="@+id/rec_instructions"
         android:layout_below="@id/top_margin"
         android:layout_height="wrap_content"
         android:layout_width="fill_parent"
         android:layout_gravity="center_vertical|center_horizontal"
         android:foregroundGravity="center"
         android:background="@drawable/recorder_bg"
-        android:layout_marginBottom="40dp"
+        android:layout_marginBottom="20dp"
+        android:orientation="horizontal"
+        android:layout_marginLeft="15dp"
+        android:layout_marginRight="15dp"
+        android:padding="3dp" >
+        <TextView
+            android:id="@+id/instructions"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:layout_gravity="center_vertical|center_horizontal"
+        	android:foregroundGravity="center"
+        	android:text="@string/instr"
+        	android:textSize="17sp"
+        	android:textColor="@color/red" >          
+        </TextView>
+    </FrameLayout>
+    
+    <FrameLayout
+        android:id="@+id/buttons_container"
+        android:layout_below="@id/rec_instructions"
+        android:layout_height="wrap_content"
+        android:layout_width="fill_parent"
+        android:layout_gravity="center_vertical|center_horizontal"
+        android:foregroundGravity="center"
+        android:background="@drawable/recorder_bg"
+        android:layout_marginBottom="20dp"
         android:orientation="horizontal"
         android:layout_marginLeft="15dp"
         android:layout_marginRight="15dp" >
@@ -29,17 +54,15 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical|center_horizontal"
-            android:src="@drawable/ic_action_pause_black_large"
-            android:background="#fff"
-            android:onClick="onRecordPressed" />      
+            android:src="@drawable/new_pause_button"
+            android:background="#fff" />      
         <ImageButton
             android:id="@+id/begin_record"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical|center_horizontal"
-            android:src="@drawable/ic_action_mic_black_large"
-            android:background="#fff"
-            android:onClick="onRecordPressed" />
+            android:src="@drawable/new_record_button"
+            android:background="#fff" />
     </FrameLayout>
     
     <FrameLayout
