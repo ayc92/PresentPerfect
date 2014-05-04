@@ -33,8 +33,10 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.ListAdapter;
 import android.widget.ListView;
+import android.widget.NumberPicker;
 import android.widget.RadioGroup;
 import android.widget.Spinner;
 import android.widget.Toast;
@@ -42,7 +44,7 @@ import android.widget.RadioGroup.OnCheckedChangeListener;
 import android.widget.TextView;
 import android.widget.TimePicker;
 
-public class OptionsActivity extends ListActivity {
+public class OptionsActivity extends Activity {
 	int hour;
 	int min;
 	EditText timeChosen;
@@ -62,17 +64,19 @@ public class OptionsActivity extends ListActivity {
 	int currList; // 0 = all, 1 = good, 2 = bad
 	Spinner spinner1; 
 	TextView placeholder;
+	LinearLayout buzzList;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_options);
+		buzzList = (LinearLayout) findViewById(R.id.buzzList);
 		main = this;
 		hour = 0;
 		min = 5;
 		timer = true;
 		deleteMode = false;
 		currList = 0;
-		timeChosen = (EditText) findViewById(R.id.editText1);
+		//timeChosen = (EditText) findViewById(R.id.editText1);
 		buzzwords = (ImageButton) findViewById(R.id.wordslist);
 		placeholder = (TextView) findViewById(R.id.placeholdr);
 		include = true;
@@ -91,13 +95,28 @@ public class OptionsActivity extends ListActivity {
 //		setListAdapter(new ArrayAdapter<String>(this,
 //                android.R.layout.simple_list_item_1,
 //                items));
-			setListAdapter(adapter);
+			//setListAdapter(adapter);
+		Log.d("OOOO", "PRE UPDATE");
+		update();
+		Log.d("OOOO", "POST UPDATE");
 		//registerForContextMenu(getListView());
 		addButtonListener();
 		addRadioListener();
 		//listv = (ListView) findViewById(R.id.list);
 		spinner1 = (Spinner) findViewById(R.id.spinner_op);
 		spinner1.setOnItemSelectedListener(new SpinnerActivity2());
+		NumberPicker np = (NumberPicker) findViewById(R.id.numberPicker1);
+		np.setMaxValue(60);
+		np.setMinValue(0);
+		np.setValue(5);
+		np.setOnValueChangedListener( new NumberPicker.
+	            OnValueChangeListener() {
+	            @Override
+	            public void onValueChange(NumberPicker picker, int
+	                oldVal, int newVal) {
+	                min = newVal;
+	            }
+	        });
 	}
 	
 
@@ -150,6 +169,7 @@ public class OptionsActivity extends ListActivity {
 		        //adapter.notifyDataSetChanged();
 //				Log.d("WHHAAT", listv.getFirstVisiblePosition()+"");
 //				View v = listv.getChildAt(1-listv.getFirstVisiblePosition());
+				deleteMode = false;
 				AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
 						main);
 				LayoutInflater inflater = main.getLayoutInflater();
@@ -203,6 +223,8 @@ public class OptionsActivity extends ListActivity {
 								}
 								include = true;
 								adapter.notifyDataSetChanged();
+								update();
+								placeholder.setVisibility(View.GONE);
 							}
 						  })
 						.setNegativeButton("Cancel",new DialogInterface.OnClickListener() {
@@ -218,7 +240,7 @@ public class OptionsActivity extends ListActivity {
 		 
 						// show it
 						alertDialog.show();
-							placeholder.setVisibility(View.GONE);
+							
 
 				}
 			});
@@ -231,6 +253,7 @@ public class OptionsActivity extends ListActivity {
 			public void onClick(View view) {
 				deleteMode = !deleteMode;
 				adapter.notifyDataSetChanged();
+				update();
 			}
 		});
 	}
@@ -251,33 +274,33 @@ public class OptionsActivity extends ListActivity {
 	    });
 	}
 	
-	public void showTimeDialog(View v)
-    {
-    	showDialog(0);
-    }
-    protected Dialog onCreateDialog(int id)
-    {
-    	switch(id)
-    	{
-    	case 0:
-    		return new TimePickerDialog(this, timeSetListener, 0, 0, true);
-    	}
-    	return null;
-    }
-    private TimePickerDialog.OnTimeSetListener timeSetListener=new TimePickerDialog.OnTimeSetListener() {
-
-		@Override
-		public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-			// TODO Auto-generated method stub
-			hour=hourOfDay;
-			min=minute;
-			if (hour != 0){
-				timeChosen.setText(hour + " hr " + min + " min");
-			} else {
-				timeChosen.setText(min + " min");
-			}
-		}
-	};
+//	public void showTimeDialog(View v)
+//    {
+//    	showDialog(0);
+//    }
+//    protected Dialog onCreateDialog(int id)
+//    {
+//    	switch(id)
+//    	{
+//    	case 0:
+//    		return new TimePickerDialog(this, timeSetListener, 0, 0, true);
+//    	}
+//    	return null;
+//    }
+//    private TimePickerDialog.OnTimeSetListener timeSetListener=new TimePickerDialog.OnTimeSetListener() {
+//
+//		@Override
+//		public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+//			// TODO Auto-generated method stub
+//			hour=hourOfDay;
+//			min=minute;
+//			if (hour != 0){
+//				timeChosen.setText(hour + " hr " + min + " min");
+//			} else {
+//				timeChosen.setText(min + " min");
+//			}
+//		}
+//	};
 	public class buzzlistAdapter extends BaseAdapter implements ListAdapter {
 		private ArrayList<String> list; 
 		private Context context; 
@@ -332,9 +355,11 @@ public class OptionsActivity extends ListActivity {
 		            	bad_items.remove(deletedWord);
 		            }
 		            notifyDataSetChanged();
+		            update();
 		        	}
 		        	if (all_items.size() == 0){
 		        		placeholder.setVisibility(View.VISIBLE);
+		        		deleteMode = false;
 		        	}
 		        }
 		    });
@@ -353,16 +378,19 @@ public class SpinnerActivity2 extends Activity implements OnItemSelectedListener
 				items.clear();
 				items.addAll(all_items);
 				adapter.notifyDataSetChanged();
+				update();
 				currList = 0;
 	    	} else if (selected.equals("Avoid")) {
 				items.clear();
 				items.addAll(bad_items);
 				adapter.notifyDataSetChanged();
+				update();
 				currList = 2;
 	    	} else if (selected.equals("Incorporate")) {
 				items.clear();
 				items.addAll(good_items);
 				adapter.notifyDataSetChanged();
+				update();
 				currList = 1;
 	    	}
 	    }
@@ -370,4 +398,34 @@ public class SpinnerActivity2 extends Activity implements OnItemSelectedListener
 	    public void onNothingSelected(AdapterView<?> parent) {
 	    }
 	}
+public void updateList(){
+	buzzList.removeAllViews();
+	LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+	for (int i = 0; i < items.size(); i++){
+		View view;
+	    Log.d("OOOO", "INNNNN"); 
+	    view = inflater.inflate(R.layout.buzzlist, null);
+	    Log.d("OOOO", "INNNN222");
+	    ImageButton deleteBtn = (ImageButton) view.findViewById(R.id.delete_btn);
+	    if(deleteMode){
+	    	deleteBtn.setVisibility(View.VISIBLE);
+	    }
+	    TextView listWord = (TextView)view.findViewById(R.id.list_item_string); 
+	    listWord.setText(items.get(i)); 
+	    buzzList.addView(view);
+	}
 }
+	public void update(){
+		buzzList.removeAllViews();
+		final int adapterCount = adapter.getCount();
+		for (int i = 0; i < adapterCount; i++) {
+			  View item = adapter.getView(i, null, null);
+			  buzzList.addView(item);
+			}
+	}
+	public void deleteWord(){
+		
+	}
+	  
+}
+

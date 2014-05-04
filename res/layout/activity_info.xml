@@ -21,29 +21,32 @@
     android:orientation="horizontal"
     android:layout_width="match_parent"
     android:layout_marginTop="20dp"
+    android:paddingTop="20dp"
+    android:paddingBottom="20dp"
+    android:background="#04476d"
     android:gravity="center_horizontal"
     android:layout_height="wrap_content">
      <ImageView
         android:id="@+id/skipback"
-        android:layout_width="45dp"
-        android:layout_height="45dp"
-        android:layout_marginRight="25dp"
-        android:layout_gravity="center_horizontal|center_vertical"
+        android:layout_width="35dp"
+        android:layout_height="35dp"
+        android:layout_marginRight="45dp"
+        android:layout_gravity="center_vertical"
         android:background="@android:color/transparent"
         android:src="@drawable/skipb" />
     <ImageView
         android:id="@+id/playrec"
-        android:layout_width="85dp"
-        android:layout_height="85dp"
-        android:layout_gravity="center_horizontal"
+        android:layout_width="35dp"
+        android:layout_height="35dp"
+        android:layout_gravity="center_vertical"
         android:background="@android:color/transparent"
         android:onClick="playback"
-        android:src="@drawable/playlightblue" />
+        android:src="@drawable/playb" />
         <ImageView
         android:id="@+id/skipforward"
-        android:layout_width="45dp"
-        android:layout_height="45dp"
-        android:layout_marginLeft="25dp"
+        android:layout_width="35dp"
+        android:layout_height="35dp"
+        android:layout_marginLeft="45dp"
         android:layout_gravity="center_horizontal|center_vertical"
         android:background="@android:color/transparent"
         android:src="@drawable/skipf" />
@@ -54,7 +57,7 @@
         android:layout_height="wrap_content"
         android:textSize="25sp"
         android:background="#52B848"
-        android:layout_marginTop="40dp"
+        android:layout_marginTop="30dp"
 		android:paddingTop="20dp"
         android:paddingBottom="20dp"
         android:paddingLeft="20dp"
