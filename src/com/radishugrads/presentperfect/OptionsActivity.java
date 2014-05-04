@@ -38,6 +38,7 @@ import android.widget.LinearLayout;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.NumberPicker;
+import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Spinner;
 import android.widget.Toast;
@@ -111,6 +112,7 @@ public class OptionsActivity extends Activity {
 		// boolean timer = getIntent().getExtras().getBoolean("timer");
 		recordIntent.putExtra("min", min);
 		// int min = mIntent.getIntExtra("min", 0);
+		startActivity(recordIntent);
 	}
 	
 	@Override
@@ -212,18 +214,18 @@ public class OptionsActivity extends Activity {
 	}
 	
 	public void addRadioListener(){
-		RadioGroup radioGroup = (RadioGroup) findViewById(R.id.timingOp);        
+		RadioGroup radioGroup = (RadioGroup) findViewById(R.id.timingOp);
 	    radioGroup.setOnCheckedChangeListener(new OnCheckedChangeListener() 
 	    {
 	        public void onCheckedChanged(RadioGroup group, int checkedId) {
-	            // checkedId is the RadioButton selected
-	        	if (checkedId == 0){
+	    		RadioButton rtimer = (RadioButton) findViewById(R.id.radioTimer);
+	    		RadioButton rstop = (RadioButton) findViewById(R.id.radioStopwatch);
+	        	if (rtimer.isChecked()){
 	        		timer = true;
-	        		Log.d("OOOO", "TIMERRRR");
-	        	} else {
+	        	} else if (rstop.isChecked()){
 	        		timer = false;
-	        		Log.d("OOOO", "STOPWATCHH");
 	        	}
+	        	
 	        }
 	    });
 	}
