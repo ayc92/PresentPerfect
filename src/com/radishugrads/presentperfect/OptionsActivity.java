@@ -53,10 +53,10 @@ public class OptionsActivity extends Activity {
 	boolean include;
 	buzzlistAdapter adapter;
 	Activity main;
-	private ArrayList<String> items= new ArrayList<String>();
-	ArrayList<String> good_items = new ArrayList<String>();
-	ArrayList<String> bad_items = new ArrayList<String>();
-	ArrayList<String> all_items = new ArrayList<String>();
+	private ArrayList<String> items = new ArrayList<String>();
+	ArrayList<String> good_items;
+	ArrayList<String> bad_items;
+	ArrayList<String> all_items;
 	boolean timer;
 	Button boot;
 	boolean deleteMode;
@@ -64,15 +64,22 @@ public class OptionsActivity extends Activity {
 	Spinner spinner1; 
 	TextView placeholder;
 	LinearLayout buzzList;
+	Bundle params;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_options);
 		buzzList = (LinearLayout) findViewById(R.id.buzzList);
+		Intent intent = getIntent();
+		params = intent.getExtras();
 		main = this;
-		min = 5;
-		timer = true;
+		min = params.getInt("min");
+		timer = params.getBoolean("timer");
+		good_items = params.getStringArrayList("good_items");
+		bad_items = params.getStringArrayList("bad_items");
+		all_items = params.getStringArrayList("all_items");
+		
 		deleteMode = false;
 		currList = 0;
 		buzzwords = (ImageButton) findViewById(R.id.wordslist);
@@ -111,6 +118,7 @@ public class OptionsActivity extends Activity {
 		recordIntent.putExtra("timer", timer);
 		// boolean timer = getIntent().getExtras().getBoolean("timer");
 		recordIntent.putExtra("min", min);
+		startActivity(recordIntent);
 		// int min = mIntent.getIntExtra("min", 0);
 		startActivity(recordIntent);
 	}

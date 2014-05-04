@@ -243,10 +243,10 @@ public class ExpandableListFragment extends TabFragment {
 		}
 		listAdapter.notifyDataSetChanged();
 		listAdapter.notifyDataSetInvalidated();
-			if (!isGroup) {
-				Intent i = new Intent(context, RecorderActivity.class);
-				startActivity(i);
-			}
+		if (!isGroup) {
+			Intent i = new Intent(context, RecorderActivity.class);
+			startActivity(i);
+		}
 	}
 	
 	private void startRemove() {
