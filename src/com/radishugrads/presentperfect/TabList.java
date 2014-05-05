@@ -1,6 +1,7 @@
 package com.radishugrads.presentperfect;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Locale;
 
 import android.os.Bundle;
@@ -13,11 +14,13 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ListAdapter;
 import android.widget.ListView;
@@ -25,11 +28,14 @@ import android.widget.TextView;
 import android.support.v4.app.ListFragment;
 
 public class TabList extends Fragment {
-	String[] notifications = {"Bob shared a recording with you", "Beyonce commented on Rich Ppl Pitch - Rec 1"};
-	String[] contacts = {"Angel", "Beyonce", "Bob", "King Henry", "Mr. Clean", "Zoo"};
+	//String[] notifications = {"Bob shared a recording with you", "Beyonce commented on VC Pitch - Rec 1"};
+	//String[] contacts = {"Angel", "Beyonce", "Bob", "King Henry", "Mr. Clean", "Zoo"};
+	ArrayList<String> notifications;
+	ArrayList<String> contacts;
 	ListView listv;
 	String tab;
 	tabAdapter adapter;
+	boolean deleteMode;
 	
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -39,6 +45,16 @@ public class TabList extends Fragment {
         String someTitle = getArguments().getString("someTitle", "");
         tab = someTitle;
         Log.d("WORKED: ", someTitle);
+        notifications = new ArrayList<String>();
+        contacts = new ArrayList<String>();
+        notifications.add("Bob shared a recording with you");
+        notifications.add("Beyonce commented on VC Pitch - Rec 1");
+        contacts.add("Angel");
+        contacts.add("Beyonce");
+        contacts.add("Bob");
+        contacts.add("King Henry");
+        contacts.add("Mr. Clean");
+        contacts.add("Zoo");
     }
     
     public static TabList newInstance(String someTitle) {
@@ -58,16 +74,27 @@ public class TabList extends Fragment {
 			LinearLayout bottom = (LinearLayout) currentTabView.findViewById(R.id.bottom_bar);
         	bottom.setVisibility(View.GONE);
         	adapter = new tabAdapter(notifications, getActivity());
-        	Button addb = (Button) currentTabView.findViewById(R.id.addProject);
-        	addb.setOnClickListener(new View.OnClickListener(){
-		        @Override
-		        public void onClick(View v) {
-		        	createChooseNameDialog();
-		        	Log.d("CLICKED ADD", "YA");
-		        }
-        	});
         } else {
         	adapter = new tabAdapter(contacts, getActivity());
+        	Button addb = (Button) currentTabView.findViewById(R.id.addProject);
+        	addb.setOnClickListener(new OnClickListener(){
+		        @Override
+		        public void onClick(View v) {
+		        	Log.d("CLICKED ADD", "YA");
+		        	createChooseNameDialog();
+		        	
+		        }
+        	});
+        	Button deleteb = (Button) currentTabView.findViewById(R.id.removeParent);
+        	deleteb.setOnClickListener(new OnClickListener(){
+		        @Override
+		        public void onClick(View v) {
+		        	Log.d("CLICKED REM", "YA");
+		        	deleteMode = !deleteMode;
+		        	adapter.notifyDataSetChanged();
+		        	
+		        }
+        	});
         }
 		listv = (ListView) currentTabView.findViewById(R.id.list);
         listv.setAdapter(adapter);
@@ -79,24 +106,24 @@ public class TabList extends Fragment {
     }
 	
 	public class tabAdapter extends BaseAdapter implements ListAdapter {
-		private String[] list; 
+		private ArrayList<String> list; 
 		private Context context; 
 
 
 
-		public tabAdapter(String[] list, Context context) { 
+		public tabAdapter(ArrayList<String> list, Context context) { 
 		    this.list = list; 
 		    this.context = context; 
 		} 
 
 		@Override
 		public int getCount() { 
-		    return list.length; 
+		    return list.size(); 
 		} 
 
 		@Override
 		public Object getItem(int pos) { 
-		    return list[pos]; 
+		    return list.get(pos); 
 		} 
 
 		@Override
@@ -114,48 +141,42 @@ public class TabList extends Fragment {
 		        Log.d("OOOO", "INNNN222");
 		    Log.d("OOOO", "IN 33333");
 		    //Handle buttons and add onClickListeners
-//		    ImageButton deleteBtn = (ImageButton) view.findViewById(R.id.delete_btn);
-//		    if(deleteMode){
-//		    	deleteBtn.setVisibility(View.VISIBLE);
-//		    }
-//		    deleteBtn.setOnClickListener(new View.OnClickListener(){
-//		        @Override
-//		        public void onClick(View v) { 
-//		            //do something
-//		        	if (deleteMode){
-//		        	String deletedWord = list.get(position);
-//		            list.remove(position); //or some other task
-//		            all_items.remove(deletedWord);
-//		            if (good_items.contains(deletedWord)){
-//		            	good_items.remove(deletedWord);
-//		            } else if (bad_items.contains(deletedWord)){
-//		            	bad_items.remove(deletedWord);
-//		            }
-//		            notifyDataSetChanged();
-//		            update();
-//		        	}
-//		        	if (all_items.size() == 0){
-//		        		placeholder.setVisibility(View.VISIBLE);
-//		        		deleteMode = false;
-//		        	}
-//		        }
-//		    });
+		    ImageButton deleteBtn = (ImageButton) view.findViewById(R.id.delete);
+		    if(deleteMode){
+		    	deleteBtn.setVisibility(View.VISIBLE);
+		    }
+		    deleteBtn.setOnClickListener(new View.OnClickListener(){
+		        @Override
+		        public void onClick(View v) { 
+		            //do something
+		        	if (deleteMode){
+		        		String deletedWord = list.get(position);
+		        		contacts.remove(deletedWord);
+		        		notifyDataSetChanged();
+		        		
+		        	}
+		        	if (contacts.size() == 0){
+		        		deleteMode = false;
+		        	}
+		        }
+		    });
 		    TextView listItemText = (TextView)view.findViewById(R.id.lblListHeader); 
-		    listItemText.setText(list[position]); 
+		    listItemText.setText(list.get(position)); 
 		    return view; 
 		} 
 		}
 	
-	private AlertDialog createChooseNameDialog() {
+	private void createChooseNameDialog() {
         AlertDialog.Builder alert = new AlertDialog.Builder(getActivity());
 		alert.setTitle("Add a new contact");
-		//alert.setMessage("Input name of "+ other + ".");
 		final EditText input = new EditText(getActivity());
 		alert.setView(input);
-		alert.setPositiveButton(R.string.create, new DialogInterface.OnClickListener() {
+		alert.setPositiveButton("Add", new DialogInterface.OnClickListener() {
 			public void onClick(DialogInterface dialog, int whichButton) {
 				String newest_input = input.getText().toString();
-				
+				contacts.add(newest_input);
+				Collections.sort(contacts);
+				adapter.notifyDataSetChanged();
 				}
 			});
 		alert.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
@@ -165,6 +186,6 @@ public class TabList extends Fragment {
 			});
 		
 		AlertDialog newDialog = alert.create();
-		return newDialog;
+		newDialog.show();
 	}
 }

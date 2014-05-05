@@ -51,7 +51,7 @@ public class Info extends MotherBrain {
 	ArrayList<Integer> counts;
 	ArrayList<String> chosen_contacts;
 	wordCountAdapter adapter;
-	String contacts[] = {"Marie Antoinette", "George Orwell", "Clifford", "my mom"};
+	String contacts[] = {"Angel", "Beyonce", "Bob", "King Henry", "Mr. Clean", "Zoo"};
 	String comments[] = {"work a little more on your enthusiasm. good use of stories", "7/10 needs more oomph"};
 	Spinner spinner1;
 	LinearLayout firstPanel;
