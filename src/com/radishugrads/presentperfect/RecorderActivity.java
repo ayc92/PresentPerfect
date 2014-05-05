@@ -147,7 +147,7 @@ public class RecorderActivity extends MotherBrain {
 		timeDisplay.setText(String.format("%1$02d:%2$02d", timeInSecs / 60, timeInSecs % 60));
 		
 		// initialize settings button onclick		
-		//last two args not used
+		// last two args not used
 		settingsButton.setOnTouchListener(new SettingsButtonOnTouchListener(R.drawable.settings,
 				R.drawable.settings_down, 0, 0));
 		
