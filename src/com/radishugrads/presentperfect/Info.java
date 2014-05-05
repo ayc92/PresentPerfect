@@ -38,7 +38,7 @@ public class Info extends MotherBrain {
 	TextView time_f;
 	TextView speed_f;
 	Object recording;
-
+	
 	ListView listcount;
 	LinearLayout comment_view;
 	boolean wordVisib;
@@ -63,7 +63,7 @@ public class Info extends MotherBrain {
 	ArrayList<Integer> bad_counts;
 	ArrayList<Integer> all_counts;
 	Bundle data;
-
+	
 	private MediaPlayer mPlayer = null;
 	String filePath = null;
 
@@ -71,10 +71,10 @@ public class Info extends MotherBrain {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_info);
-
+		
 		// format action bar
 		formatActionBar("Feedback");
-
+		
 		data = getIntent().getExtras();
 		actual_min = data.getInt("cur_time") / 60;
 		actual_sec = data.getInt("cur_time") % 60;
@@ -83,16 +83,16 @@ public class Info extends MotherBrain {
 		wpm = data.getInt("wpm");
 		good_items = new ArrayList<String>(((HashMap<String, Integer>) data.getSerializable("good")).keySet());
 		good_counts = new ArrayList<Integer>(((HashMap<String, Integer>) data.getSerializable("good")).values());
-
+		
 		bad_items = new ArrayList<String>(((HashMap<String, Integer>) data.getSerializable("bad")).keySet());
 		bad_counts = new ArrayList<Integer>(((HashMap<String, Integer>) data.getSerializable("bad")).values());
-
+		
 		all_items = new ArrayList<String>(((HashMap<String, Integer>) data.getSerializable("all")).keySet());
 		all_counts = new ArrayList<Integer>(((HashMap<String, Integer>) data.getSerializable("all")).values());
-
+		
 		words = all_items;
 		counts = all_counts;
-
+		
 		time_f = (TextView) findViewById(R.id.speechtime);
 		speed_f = (TextView) findViewById(R.id.wordspermin);
 		if (actual_min > target_min || (actual_min == target_min && actual_sec > target_sec)){
@@ -103,7 +103,7 @@ public class Info extends MotherBrain {
 			speed_f.setBackgroundColor(Color.parseColor("#D22027"));
 		}
 		speed_f.setText("Speed: " + wpm + " wpm");
-
+		
 		wordVisib = false;
 		commentVisib = false;
 		notesVisib = false;
@@ -126,14 +126,14 @@ public class Info extends MotherBrain {
 		getMenuInflater().inflate(R.menu.mother_brain, menu);
 		return true;
 	}
-
+	
 	@Override
 	public void onBackPressed() {
 		Intent recordIntent = new Intent(this, RecList.class);
 		startActivity(recordIntent);
 		finish();
 	}
-
+	
 //	public void tempHardcode(){
 //		actual_min = 0;
 //		actual_sec = 14;
@@ -149,7 +149,7 @@ public class Info extends MotherBrain {
 //		all_items.add("um");
 //		all_items.add("user generated content");
 //	}
-
+	
 	public void toggle_contents(View v){
 		if (wordVisib){
 			firstPanel.setVisibility(View.GONE);
@@ -160,7 +160,7 @@ public class Info extends MotherBrain {
 		}
 		wordVisib = !wordVisib;
 	}
-
+	
 	public void toggle_contents2(View v){
 		if (commentVisib){
 			comment_view.setVisibility(View.GONE);
@@ -171,7 +171,7 @@ public class Info extends MotherBrain {
 		}
 		commentVisib = !commentVisib;
 	}
-
+	
 	public void toggle_contents3(View v){
 		if (notesVisib){
 			notes.setVisibility(View.GONE);
@@ -182,7 +182,7 @@ public class Info extends MotherBrain {
 		}
 		notesVisib = !notesVisib;
 	}
-
+	
 	public class wordCountAdapter extends BaseAdapter implements ListAdapter {
 		private ArrayList<String> list; 
 		private Context context; 
@@ -225,10 +225,10 @@ public class Info extends MotherBrain {
 		    return view; 
 		} 
 		}
-
-
+	
+	
 public class SpinnerActivity1 extends Activity implements OnItemSelectedListener {
-
+	    
 	    public void onItemSelected(AdapterView<?> parent, View view, 
 	            int pos, long id) {
 	    	String selected = parent.getItemAtPosition(pos).toString();
@@ -254,7 +254,7 @@ public class SpinnerActivity1 extends Activity implements OnItemSelectedListener
 	}
 
 	public void shareAction(View v){
-
+	
 		AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
 				this);
 		LayoutInflater inflater = getLayoutInflater();
@@ -287,7 +287,7 @@ public class SpinnerActivity1 extends Activity implements OnItemSelectedListener
 					// if this button is clicked, close
 					// current activity
 					//MainActivity.this.finish();
-
+					
 				}
 			  })
 			.setNegativeButton("Cancel",new DialogInterface.OnClickListener() {
@@ -318,7 +318,7 @@ public class SpinnerActivity1 extends Activity implements OnItemSelectedListener
             Log.e("", "prepare() failed");
         }
 	}
-
+	
 	public void updateList(){
 		LinearLayout countList = (LinearLayout) findViewById(R.id.countList);
 		countList.removeAllViews();
@@ -335,7 +335,7 @@ public class SpinnerActivity1 extends Activity implements OnItemSelectedListener
 		    listWord.setText(words.get(i));
 		    countList.addView(view);
 		}
-
+		  
 	}
 	public void updateList_comments(){
 		comment_view.removeAllViews();
@@ -352,7 +352,7 @@ public class SpinnerActivity1 extends Activity implements OnItemSelectedListener
 		    listComment.setText(comments[i]);
 		    comment_view.addView(view);
 		}
-
+		  
 	}
 
 }

@@ -28,42 +28,42 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 public class RecorderActivity extends MotherBrain {
-
+	
 	Context context;
-
+	
 	// views
 	RelativeLayout recordView;
 	ImageButton recordButton;
 	ImageButton pauseButton;
 	ImageButton settingsButton;
 	TextView timeDisplay;
-
+	
 	// params and default params
 	Bundle params;
 	private final boolean IS_TIMER = true;
 	private final int TIME_LIMIT = 5;
-
+	
 	// time displays (default is stopwatch)
 	Handler handler;
 	boolean isTimer;
 	int timeInSecs;
 	int timeLimit;
-
+	
 	// current mic
 	Handler micHandler;
 	int currentMic;
-
+	
 	// animation
 	TranslateAnimation slideLeft;
 	TranslateAnimation slideRight;
 	LayoutAnimationController animController;
 	AnimationListener animListener;
-
+	
 	// flags
 	boolean isRecording;
 	boolean animEnabled;
 	boolean isPaused;
-
+	
 	// recording variables
 	static final int SAMPLE_RATE = 8000;
 	byte[] buffer;
@@ -71,39 +71,39 @@ public class RecorderActivity extends MotherBrain {
 	int bufReadResult;
 	AudioTrack audioTrack;
 	RecordTask recordTask;
-
+	
 	File mFile = null;
 	String filePath = null;
 	private MediaRecorder mRecorder = null;
     private MediaPlayer   mPlayer = null;
-
+	
 	// data variables
 	HashMap<String, Integer> goodWordCounts;
 	HashMap<String, Integer> badWordCounts;
 	HashMap<String, Integer> allWordCounts;
 	int wordsPerMin;
-
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.recording);
-
+		
 		context = this;
-
+		
 		// format action bar
 		formatActionBar("Recorder");
-
+		
 		// get params
 		goodWordCounts = new HashMap<String, Integer>();
 		badWordCounts = new HashMap<String, Integer>();
 		allWordCounts = new HashMap<String, Integer>();
-
+		
 		params = getIntent().getExtras();
 		if (params != null) {
 			ArrayList<String> good_items = params.getStringArrayList("good_items");
 			ArrayList<String> bad_items = params.getStringArrayList("bad_items");
 			ArrayList<String> all_items = params.getStringArrayList("all_items");
-
+			
 			for (String str : good_items) {
 				goodWordCounts.put(str, 0);
 			}
@@ -129,21 +129,21 @@ public class RecorderActivity extends MotherBrain {
 			params.putStringArrayList("all_items", new ArrayList<String>());
 			params.putBoolean("timer", true);
 			params.putInt("min", TIME_LIMIT);
-
+			
 			isTimer = IS_TIMER;
 			timeInSecs = TIME_LIMIT * 60;
 			timeLimit = timeInSecs;
 		}
-
-
+		
+		
 		// get needed views
 		recordButton = (ImageButton) findViewById(R.id.begin_record);
 		pauseButton = (ImageButton) findViewById(R.id.pause_record);
 		settingsButton = (ImageButton) findViewById(R.id.settings_button);
 		timeDisplay = (TextView) findViewById(R.id.time_display);
-
+		
 		timeDisplay.setText(String.format("%1$02d:%2$02d", timeInSecs / 60, timeInSecs % 60));
-
+		
 		// initialize settings button onclick
 		settingsButton.setOnClickListener(new View.OnClickListener() {
 			@Override
@@ -153,7 +153,7 @@ public class RecorderActivity extends MotherBrain {
 	    		startActivity(recordIntent);
 			}
 		});
-
+		
 		// initialize button images to handle press and hold
 		recordButton.setOnTouchListener(new View.OnTouchListener() {
 			@Override
@@ -177,7 +177,7 @@ public class RecorderActivity extends MotherBrain {
 						// start timer/stopwatch
 						handler.postDelayed(updateTime, 800);
 						handler.postDelayed(flashMic, 200);
-
+						
 						// TODO: speech recognition
 					}
 					isRecording = !isRecording;
@@ -210,7 +210,7 @@ public class RecorderActivity extends MotherBrain {
 				return false;
 			}
 		});
-
+		
 		// setup animations
 		slideLeft = new TranslateAnimation (
 				Animation.RELATIVE_TO_SELF, 0.0f, Animation.RELATIVE_TO_SELF, -0.5f,
@@ -219,28 +219,28 @@ public class RecorderActivity extends MotherBrain {
 		slideLeft.setFillEnabled(true);
 		slideLeft.setDuration(300);
 		slideLeft.setAnimationListener(new SlideListenerWithView((View) recordButton, -1));
-
+		
 		slideRight = new TranslateAnimation (
 				Animation.RELATIVE_TO_SELF, 0.0f, Animation.RELATIVE_TO_SELF, 0.5f,
 				Animation.RELATIVE_TO_SELF, 0.0f, Animation.RELATIVE_TO_SELF, 0.0f
 				);
 		slideRight.setDuration(300);
 		slideRight.setAnimationListener(new SlideListenerWithView((View) pauseButton, 1));
-
+		
 		// set flags
 		isRecording = false;
 		animEnabled = true;
 		isPaused = false;
-
+		
 		// setup timer
 		handler = new Handler();
-
+		
 		// words per min
 		wordsPerMin = 0;
-
+		
 		// setup current mic
 		currentMic = R.drawable.new_record_button;
-
+		
 		// setup sound recorder and audio track
 		int bufferSize = AudioRecord.getMinBufferSize(SAMPLE_RATE, AudioFormat.CHANNEL_IN_MONO,
 		        AudioFormat.ENCODING_PCM_16BIT);
@@ -258,7 +258,7 @@ public class RecorderActivity extends MotherBrain {
         		AudioFormat.ENCODING_PCM_16BIT,
         		bufferSize,
         		AudioTrack.MODE_STATIC);
-
+		
 		mFile = new File(getFilesDir(), "audiotest.3gp");
 		filePath = mFile.getAbsolutePath();
 	}
@@ -269,14 +269,14 @@ public class RecorderActivity extends MotherBrain {
 		startActivity(recordIntent);
 		finish();
 	}
-
+	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.mother_brain, menu);
 		return true;
 	}
-
+	
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 	    // Handle presses on the action bar items
@@ -290,7 +290,7 @@ public class RecorderActivity extends MotherBrain {
 	            return super.onOptionsItemSelected(item);
 	    }
 	}
-
+	
 	// remove callbacks and create new intent
 	private void sendFeedbackIntent() {
 		handler.removeCallbacks(updateTime);
@@ -313,7 +313,7 @@ public class RecorderActivity extends MotherBrain {
 		recordIntent.putExtras(data);
 		startActivity(recordIntent);
 	}
-
+	
 	// run button slide animation
 	private void slideButtons() {
 		recordButton.startAnimation(slideLeft);
@@ -325,7 +325,7 @@ public class RecorderActivity extends MotherBrain {
 		recordButton.setImageResource(resourceId);
 		currentMic = resourceId;
 	}
-
+	
 	// runnable for updating time
 	private Runnable updateTime = new Runnable() {
 		public void run() {
@@ -343,7 +343,7 @@ public class RecorderActivity extends MotherBrain {
 			handler.postDelayed(this, 1000);
 		}
 	};
-
+	
 	// runnable for indicating record mode (flashing)
 	private Runnable flashMic = new Runnable() {
 		public void run() {
@@ -358,7 +358,7 @@ public class RecorderActivity extends MotherBrain {
 			handler.postDelayed(this, 800);
 		}
 	};
-
+	
 	// class for handling stuff after animation
 	private class SlideListenerWithView implements AnimationListener {
 		View v;
@@ -369,7 +369,7 @@ public class RecorderActivity extends MotherBrain {
 			this.v = v;
 			this.direction = direction;
 		}
-
+		
 		@Override
 		public void onAnimationEnd(Animation animation) {
 			v.setX(v.getX() + direction * v.getWidth() * 0.5f);
@@ -382,15 +382,15 @@ public class RecorderActivity extends MotherBrain {
 		@Override
 		public void onAnimationStart(Animation animation) {
 		}
-
+		
 	}
-
+	
 	// helper method for starting a new record task
 	public void runNewRecordTask() {
 		recordTask = new RecordTask();
 		recordTask.execute();
 	}
-
+	
 	// async task for recording in background thread
 	private class RecordTask extends AsyncTask<Void, Void, Void> {
 		@Override
