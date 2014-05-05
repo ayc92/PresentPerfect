@@ -217,6 +217,7 @@
     	android:hint="Type notes here"
     />
 			</LinearLayout>
+		<!--
 			     <ImageView
         android:id="@+id/skipback"
         android:layout_width="wrap_content"
@@ -226,6 +227,7 @@
         android:clickable="true"
     	android:onClick="shareAction"
         android:src="@drawable/shareblue" />
+        -->
 </LinearLayout>
 </ScrollView>
 </LinearLayout>
