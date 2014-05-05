@@ -1,5 +1,6 @@
 package com.radishugrads.presentperfect;
 
+import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -161,6 +162,32 @@ public class ExpandableListFragment extends TabFragment {
 	            		alert.show();
 	            	} else {
 	            			Intent i = new Intent(context, Info.class);
+	            			// fake data here
+	            			File mFile = new File(getActivity().getFilesDir(), "audiotest.3gp");
+	            			String filePath = mFile.getAbsolutePath();
+	            			Bundle data = new Bundle();
+	            			i.putExtra("recordPath", filePath);
+	            			data.putBoolean("over_time", true);
+	            			HashMap<String, Integer> goodWordCounts = new HashMap<String, Integer>();
+	            			goodWordCounts.put("crowdsourced", 5);
+	            			goodWordCounts.put("user-generated content", 3);
+	            			
+	            			HashMap<String, Integer> badWordCounts = new HashMap<String, Integer>();
+	            			badWordCounts.put("um", 9);
+	            			badWordCounts.put("like", 4);
+	            			
+	            			HashMap<String, Integer> allWordCounts = new HashMap<String, Integer>();
+	            			badWordCounts.putAll(goodWordCounts);
+	            			badWordCounts.putAll(badWordCounts);
+	            			
+	            			data.putSerializable("good", goodWordCounts);
+	            			data.putSerializable("bad", badWordCounts);
+	            			data.putSerializable("all", allWordCounts);
+	            			data.putSerializable("wpm", 120);
+	            			data.putInt("cur_time", 310);
+	            			data.putInt("time_limit", 300);
+	            			
+	            			i.putExtras(data);
 	            			startActivity(i);
 	            	}
 	                return false;
