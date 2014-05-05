@@ -17,6 +17,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -108,7 +109,7 @@ public class Info extends MotherBrain {
 				time_f.setText(String.format("%1$02d:%2$02d is up!", target_min, target_sec));
 			}
 		}
-		if (!is_timer) {
+		if (!over_time) {
 			time_f.setText(String.format("Speech time: %1$02d:%2$02d", actual_min, actual_sec));
 		}
 		if (wpm > 150 || wpm < 130){
@@ -135,8 +136,60 @@ public class Info extends MotherBrain {
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.mother_brain, menu);
+		getMenuInflater().inflate(R.menu.info, menu);
 		return true;
+	}
+	
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+			case R.id.action_share:
+				AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
+						this);
+
+				// set title
+				alertDialogBuilder.setTitle("Contacts to share with")
+					.setCancelable(false)
+					.setMultiChoiceItems(contacts, null,
+		                      new DialogInterface.OnMultiChoiceClickListener() {
+		               @Override
+		               public void onClick(DialogInterface dialog, int which,
+		                       boolean isChecked) {
+		                   if (isChecked) {
+		                       // If the user checked the item, add it to the selected items
+		                	   Log.d("ADDED: ", ""+contacts[which]);
+		                       chosen_contacts.add(contacts[which]);
+		                   } else if (chosen_contacts.contains(contacts[which])) {
+		                       // Else, if the item is already in the array, remove it 
+		                	   Log.d("REMOVED: ", ""+contacts[which]);
+		                       chosen_contacts.remove(contacts[which]);
+		                   }
+		               }
+		           })
+					.setPositiveButton("Done",new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog,int id) {
+							// if this button is clicked, close
+							// current activity
+							//MainActivity.this.finish();
+							
+						}
+					  })
+					.setNegativeButton("Cancel",new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog,int id) {
+							// if this button is clicked, just close
+							// the dialog box and do nothing
+							dialog.cancel();
+						}
+					});
+
+					// create alert dialog
+					AlertDialog alertDialog = alertDialogBuilder.create();
+
+					// show it
+					alertDialog.show();
+					break;
+		}
+		return false;
 	}
 	
 	@Override
@@ -254,12 +307,7 @@ public class SpinnerActivity1 extends Activity implements OnItemSelectedListener
 	
 		AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
 				this);
-		LayoutInflater inflater = getLayoutInflater();
 
-    // Inflate and set the layout for the dialog
-    // Pass null as the parent view because its going in the dialog layout
-//	final View v = inflater.inflate(R.layout.buzzworddialog, null);
-//	alertDialogBuilder.setView(v);
 		// set title
 		alertDialogBuilder.setTitle("Contacts to share with")
 			.setCancelable(false)
