@@ -144,15 +144,10 @@ public class RecorderActivity extends MotherBrain {
 		
 		timeDisplay.setText(String.format("%1$02d:%2$02d", timeInSecs / 60, timeInSecs % 60));
 		
-		// initialize settings button onclick
-		settingsButton.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				Intent recordIntent = new Intent(context, OptionsActivity.class);
-	        	recordIntent.putExtras(params);
-	    		startActivity(recordIntent);
-			}
-		});
+		// initialize settings button onclick		
+		//last two args not used
+		settingsButton.setOnTouchListener(new SettingsButtonOnTouchListener(R.drawable.settings,
+				R.drawable.settings_down, 0, 0));
 		
 		// initialize button images to handle press and hold
 		recordButton.setOnTouchListener(new RecordButtonOnTouchListener(R.drawable.new_record_button,
@@ -428,5 +423,26 @@ public class RecorderActivity extends MotherBrain {
 			}
 			return false;
 		}
+	}
+	
+	private class SettingsButtonOnTouchListener extends ButtonOnTouchListener {
+
+		public SettingsButtonOnTouchListener(int s, int ds, int e, int de) {
+			super(s, ds, e, de);
+		}
+
+		@Override
+		public boolean onTouch(View v, MotionEvent event) {
+			if (event.getAction() == android.view.MotionEvent.ACTION_DOWN) {
+				settingsButton.setImageResource(downStartResource);
+			} else {
+				settingsButton.setImageResource(startResource);
+				Intent recordIntent = new Intent(context, OptionsActivity.class);
+	        	recordIntent.putExtras(params);
+	    		startActivity(recordIntent);
+			}
+			return false;
+		}
+		
 	}
 }
