@@ -95,6 +95,7 @@ public class ExpandableListFragment extends TabFragment {
 		delButton = (Button) currentTabView.findViewById(R.id.removeParent);
 		if (tab.equals("shared")){
 			addButton.setVisibility(View.GONE);
+//			delButton.setVisibility(View.GONE);
 		}
 		OnClickListener buttonListener = new OnClickListener() {
 			

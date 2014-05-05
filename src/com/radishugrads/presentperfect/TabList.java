@@ -1,11 +1,14 @@
 package com.radishugrads.presentperfect;
 
 import java.util.ArrayList;
+import java.util.Locale;
 
 import android.os.Bundle;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.support.v4.app.Fragment;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -13,6 +16,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListAdapter;
 import android.widget.ListView;
@@ -49,17 +54,24 @@ public class TabList extends Fragment {
         /** Creating an array adapter to store the list of countries **/
         //ArrayAdapter<String> adapter = new ArrayAdapter<String>(inflater.getContext(), android.R.layout.simple_list_item_1, notifications);
 		View currentTabView = inflater.inflate(R.layout.activity_tab_list, container, false);
-        listv = (ListView) currentTabView.findViewById(R.id.list);
-        listv.setAdapter(adapter);
 		if (tab.equals("notifications")){
+			LinearLayout bottom = (LinearLayout) currentTabView.findViewById(R.id.bottom_bar);
+        	bottom.setVisibility(View.GONE);
         	adapter = new tabAdapter(notifications, getActivity());
+        	Button addb = (Button) currentTabView.findViewById(R.id.addProject);
+        	addb.setOnClickListener(new View.OnClickListener(){
+		        @Override
+		        public void onClick(View v) {
+		        	createChooseNameDialog();
+		        	Log.d("CLICKED ADD", "YA");
+		        }
+        	});
         } else {
         	adapter = new tabAdapter(contacts, getActivity());
         }
-        if (tab.equals("notifications")){
-        	LinearLayout bottom = (LinearLayout) currentTabView.findViewById(R.id.bottom_bar);
-        	bottom.setVisibility(View.GONE);
-        }
+		listv = (ListView) currentTabView.findViewById(R.id.list);
+        listv.setAdapter(adapter);
+
         /** Setting the list adapter for the ListFragment */
         //setListAdapter(adapter);
  
@@ -133,4 +145,26 @@ public class TabList extends Fragment {
 		    return view; 
 		} 
 		}
+	
+	private AlertDialog createChooseNameDialog() {
+        AlertDialog.Builder alert = new AlertDialog.Builder(getActivity());
+		alert.setTitle("Add a new contact");
+		//alert.setMessage("Input name of "+ other + ".");
+		final EditText input = new EditText(getActivity());
+		alert.setView(input);
+		alert.setPositiveButton(R.string.create, new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int whichButton) {
+				String newest_input = input.getText().toString();
+				
+				}
+			});
+		alert.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int whichButton) {
+				
+			}
+			});
+		
+		AlertDialog newDialog = alert.create();
+		return newDialog;
+	}
 }
