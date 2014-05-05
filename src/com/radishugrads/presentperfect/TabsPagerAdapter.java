@@ -22,13 +22,17 @@ public class TabsPagerAdapter extends FragmentPagerAdapter {
 		System.out.println("called this");
 		// only the notifications tab is not an expandable list view
 		if (index == 0) {
-			return new TabList();
+			TabList tbs = TabList.newInstance("notifications");
+			return tbs;
 		} else if (index == 2){
 			ExpandableListFragment exp = ExpandableListFragment.newInstance(5, "shared");
 			return exp;
-		} else {
+		} else if(index == 1){
 			ExpandableListFragment exp = ExpandableListFragment.newInstance(5, "recordings");
 			return exp;
+		} else {
+			TabList tbs = TabList.newInstance("comments");
+			return tbs;
 		}
 	}
 

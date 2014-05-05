@@ -4,7 +4,6 @@ import java.util.ArrayList;
 
 import android.os.Bundle;
 import android.app.Activity;
-
 import android.support.v4.app.Fragment;
 import android.content.Context;
 import android.util.Log;
@@ -14,22 +13,53 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
+import android.widget.LinearLayout;
 import android.widget.ListAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.support.v4.app.ListFragment;
 
 public class TabList extends Fragment {
 	String[] notifications = {"Bob shared a recording with you", "Beyonce commented on Rich Ppl Pitch - Rec 1"};
+	String[] contacts = {"Angel", "Beyonce", "Bob", "King Henry", "Mr. Clean", "Zoo"};
 	ListView listv;
+	String tab;
+	tabAdapter adapter;
+	
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        //setContentView(R.layout.main);
+        //setUpView(); 
+        String someTitle = getArguments().getString("someTitle", "");
+        tab = someTitle;
+        Log.d("WORKED: ", someTitle);
+    }
+    
+    public static TabList newInstance(String someTitle) {
+        TabList explf = new TabList();
+        Bundle args = new Bundle();
+        args.putString("someTitle", someTitle);
+        explf.setArguments(args);
+        return explf;
+    }
 	
 	@Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
         /** Creating an array adapter to store the list of countries **/
         //ArrayAdapter<String> adapter = new ArrayAdapter<String>(inflater.getContext(), android.R.layout.simple_list_item_1, notifications);
-        tabAdapter adapter = new tabAdapter(notifications, getActivity());
 		View currentTabView = inflater.inflate(R.layout.activity_tab_list, container, false);
         listv = (ListView) currentTabView.findViewById(R.id.list);
         listv.setAdapter(adapter);
+		if (tab.equals("notifications")){
+        	adapter = new tabAdapter(notifications, getActivity());
+        } else {
+        	adapter = new tabAdapter(contacts, getActivity());
+        }
+        if (tab.equals("notifications")){
+        	LinearLayout bottom = (LinearLayout) currentTabView.findViewById(R.id.bottom_bar);
+        	bottom.setVisibility(View.GONE);
+        }
         /** Setting the list adapter for the ListFragment */
         //setListAdapter(adapter);
  
@@ -68,7 +98,7 @@ public class TabList extends Fragment {
 		    View view;
 		    Log.d("OOOO", "INNNNN");
 		        LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE); 
-		        view = inflater.inflate(R.layout.buzzlist, null);
+		        view = inflater.inflate(R.layout.tab_list, null);
 		        Log.d("OOOO", "INNNN222");
 		    Log.d("OOOO", "IN 33333");
 		    //Handle buttons and add onClickListeners
@@ -98,8 +128,8 @@ public class TabList extends Fragment {
 //		        	}
 //		        }
 //		    });
-//		    TextView listItemText = (TextView)view.findViewById(R.id.list_item_string); 
-//		    listItemText.setText(list.get(position)); 
+		    TextView listItemText = (TextView)view.findViewById(R.id.lblListHeader); 
+		    listItemText.setText(list[position]); 
 		    return view; 
 		} 
 		}
