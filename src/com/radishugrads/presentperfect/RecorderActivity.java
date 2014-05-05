@@ -299,6 +299,7 @@ public class RecorderActivity extends MotherBrain {
 		Intent recordIntent = new Intent(context, Info.class);
 		recordIntent.putExtra("recordPath", filePath);
 		Bundle data = new Bundle();
+		data.putBoolean("is_timer", isTimer);
 		if (!isTimer) {
 			data.putBoolean("over_time", timeInSecs > timeLimit);
 		} else {
@@ -333,6 +334,7 @@ public class RecorderActivity extends MotherBrain {
 				if (timeInSecs == 0) {
 					setRecordButtonImage(R.drawable.new_record_button);
 					sendFeedbackIntent();
+					return;
 				} else {
 					timeInSecs -= 1;
 				}

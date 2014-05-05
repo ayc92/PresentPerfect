@@ -62,6 +62,8 @@ public class Info extends MotherBrain {
 	ArrayList<Integer> good_counts;
 	ArrayList<Integer> bad_counts;
 	ArrayList<Integer> all_counts;
+	boolean is_timer;
+	boolean over_time;
 	Bundle data;
 	
 	private MediaPlayer mPlayer = null;
@@ -76,10 +78,12 @@ public class Info extends MotherBrain {
 		formatActionBar("Feedback");
 		
 		data = getIntent().getExtras();
+		is_timer = data.getBoolean("is_timer");
 		actual_min = data.getInt("cur_time") / 60;
 		actual_sec = data.getInt("cur_time") % 60;
 		target_min = data.getInt("time_limit") / 60;
 		target_sec = data.getInt("time_limit") % 60;
+		over_time = data.getBoolean("over_time");
 		wpm = data.getInt("wpm");
 		good_items = new ArrayList<String>(((HashMap<String, Integer>) data.getSerializable("good")).keySet());
 		good_counts = new ArrayList<Integer>(((HashMap<String, Integer>) data.getSerializable("good")).values());
@@ -90,15 +94,23 @@ public class Info extends MotherBrain {
 		all_items = new ArrayList<String>(((HashMap<String, Integer>) data.getSerializable("all")).keySet());
 		all_counts = new ArrayList<Integer>(((HashMap<String, Integer>) data.getSerializable("all")).values());
 		
-		words = all_items;
-		counts = all_counts;
+		words = new ArrayList<String>();
+		words.addAll(all_items);
+		counts = new ArrayList<Integer>();
+		counts.addAll(all_counts);
+		updateList();
 		
 		time_f = (TextView) findViewById(R.id.speechtime);
 		speed_f = (TextView) findViewById(R.id.wordspermin);
-		if (actual_min > target_min || (actual_min == target_min && actual_sec > target_sec)){
+		if (over_time){
 			time_f.setBackgroundColor(Color.parseColor("#D22027"));
+			if (is_timer) {
+				time_f.setText(String.format("%1$02d:%2$02d is up!", target_min, target_sec));
+			}
 		}
-		time_f.setText("Speech time: " + actual_min + ":" + actual_sec);
+		if (!is_timer) {
+			time_f.setText(String.format("Speech time: %1$02d:%2$02d", actual_min, actual_sec));
+		}
 		if (wpm > 150 || wpm < 130){
 			speed_f.setBackgroundColor(Color.parseColor("#D22027"));
 		}
@@ -133,22 +145,6 @@ public class Info extends MotherBrain {
 		startActivity(recordIntent);
 		finish();
 	}
-	
-//	public void tempHardcode(){
-//		actual_min = 0;
-//		actual_sec = 14;
-//		target_min = 0;
-//		target_sec = 13;
-//		wpm = 120;
-//		counts = new ArrayList<String>();
-//		counts.add("like");
-//		counts.add("um");
-//		counts.add("user generated content");
-//		all_items = new ArrayList<String>();
-//		all_items.add("like");
-//		all_items.add("um");
-//		all_items.add("user generated content");
-//	}
 	
 	public void toggle_contents(View v){
 		if (wordVisib){
@@ -235,6 +231,7 @@ public class SpinnerActivity1 extends Activity implements OnItemSelectedListener
 	    	words.clear();
 	    	counts.clear();
 	    	if (selected.equals("All")){
+	    		System.out.println("haha");
 				words.addAll(all_items);
 				counts.addAll(all_counts);
 				updateList();

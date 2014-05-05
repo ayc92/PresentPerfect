@@ -168,6 +168,7 @@ public class ExpandableListFragment extends TabFragment {
 	            			String filePath = mFile.getAbsolutePath();
 	            			Bundle data = new Bundle();
 	            			i.putExtra("recordPath", filePath);
+	            			data.putBoolean("is_timer", true);
 	            			data.putBoolean("over_time", true);
 	            			HashMap<String, Integer> goodWordCounts = new HashMap<String, Integer>();
 	            			goodWordCounts.put("crowdsourced", 5);
@@ -178,8 +179,8 @@ public class ExpandableListFragment extends TabFragment {
 	            			badWordCounts.put("like", 4);
 	            			
 	            			HashMap<String, Integer> allWordCounts = new HashMap<String, Integer>();
-	            			badWordCounts.putAll(goodWordCounts);
-	            			badWordCounts.putAll(badWordCounts);
+	            			allWordCounts.putAll(goodWordCounts);
+	            			allWordCounts.putAll(badWordCounts);	            			
 	            			
 	            			data.putSerializable("good", goodWordCounts);
 	            			data.putSerializable("bad", badWordCounts);
