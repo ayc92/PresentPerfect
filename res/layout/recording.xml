@@ -9,7 +9,7 @@
         android:layout_alignParentTop="true"
         android:layout_centerVertical="true"
         android:layout_width="fill_parent"
-        android:layout_height="60dp" >
+        android:layout_height="30dp" >
     </FrameLayout>
     
     <FrameLayout
@@ -67,13 +67,15 @@
     
     <FrameLayout
         android:layout_below="@id/buttons_container"
+        android:id="@+id/time_container"
         android:layout_height="wrap_content"
         android:layout_width="fill_parent"
         android:layout_gravity="center_vertical|center_horizontal"
         android:foregroundGravity="center"
         android:background="@drawable/recorder_bg"
         android:layout_marginLeft="15dp"
-        android:layout_marginRight="15dp" >
+        android:layout_marginRight="15dp"
+        android:layout_marginBottom="20dp" >
         <TextView
             android:id="@+id/time_display"
             android:layout_height="wrap_content"
@@ -84,6 +86,24 @@
         	android:textSize="80sp"
         	android:textColor="#187DBD" >          
         </TextView>
+    </FrameLayout>
+    
+    <FrameLayout
+        android:layout_below="@id/time_container"
+        android:layout_height="wrap_content"
+        android:layout_width="fill_parent"
+        android:layout_gravity="center_vertical|center_horizontal"
+        android:foregroundGravity="center"
+        android:background="@drawable/recorder_bg"
+        android:layout_marginLeft="15dp"
+        android:layout_marginRight="15dp" >
+        <ImageButton
+            android:id="@+id/settings_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical|center_horizontal"
+            android:src="@drawable/settings"
+            android:background="#fff" />
     </FrameLayout>
 
 </RelativeLayout>

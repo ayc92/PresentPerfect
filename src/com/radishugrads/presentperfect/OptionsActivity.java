@@ -46,7 +46,7 @@ import android.widget.RadioGroup.OnCheckedChangeListener;
 import android.widget.TextView;
 import android.widget.TimePicker;
 
-public class OptionsActivity extends Activity {
+public class OptionsActivity extends MotherBrain {
 	int min;
 	EditText timeChosen;
 	ImageButton buzzwords;
@@ -70,6 +70,10 @@ public class OptionsActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_options);
+		
+		// format action bar
+		formatActionBar("Options");
+		
 		buzzList = (LinearLayout) findViewById(R.id.buzzList);
 		Intent intent = getIntent();
 		params = intent.getExtras();
@@ -126,7 +130,7 @@ public class OptionsActivity extends Activity {
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.options, menu);
+		getMenuInflater().inflate(R.menu.mother_brain, menu);
 		return true;
 	}
 	

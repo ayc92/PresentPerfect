@@ -35,6 +35,7 @@ public class RecorderActivity extends MotherBrain {
 	RelativeLayout recordView;
 	ImageButton recordButton;
 	ImageButton pauseButton;
+	ImageButton settingsButton;
 	TextView timeDisplay;
 	
 	// params and default params
@@ -93,11 +94,16 @@ public class RecorderActivity extends MotherBrain {
 		formatActionBar("Recorder");
 		
 		// get params
+		goodWordCounts = new HashMap<String, Integer>();
+		badWordCounts = new HashMap<String, Integer>();
+		allWordCounts = new HashMap<String, Integer>();
+		
 		params = getIntent().getExtras();
 		if (params != null) {
 			ArrayList<String> good_items = params.getStringArrayList("good_items");
 			ArrayList<String> bad_items = params.getStringArrayList("bad_items");
 			ArrayList<String> all_items = params.getStringArrayList("all_items");
+			
 			for (String str : good_items) {
 				goodWordCounts.put(str, 0);
 			}
@@ -124,9 +130,6 @@ public class RecorderActivity extends MotherBrain {
 			params.putBoolean("timer", true);
 			params.putInt("min", TIME_LIMIT);
 			
-			goodWordCounts = new HashMap<String, Integer>();
-			badWordCounts = new HashMap<String, Integer>();
-			allWordCounts = new HashMap<String, Integer>();
 			isTimer = IS_TIMER;
 			timeInSecs = TIME_LIMIT * 60;
 			timeLimit = timeInSecs;
@@ -136,13 +139,20 @@ public class RecorderActivity extends MotherBrain {
 		// get needed views
 		recordButton = (ImageButton) findViewById(R.id.begin_record);
 		pauseButton = (ImageButton) findViewById(R.id.pause_record);
+		settingsButton = (ImageButton) findViewById(R.id.settings_button);
 		timeDisplay = (TextView) findViewById(R.id.time_display);
 		
 		timeDisplay.setText(String.format("%1$02d:%2$02d", timeInSecs / 60, timeInSecs % 60));
 		
-		// initialize data vars
-//		wordCounts = new HashMap<String, Integer>();
-//		wordsPerMin = 0;
+		// initialize settings button onclick
+		settingsButton.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				Intent recordIntent = new Intent(context, OptionsActivity.class);
+	        	recordIntent.putExtras(params);
+	    		startActivity(recordIntent);
+			}
+		});
 		
 		// initialize button images to handle press and hold
 		recordButton.setOnTouchListener(new View.OnTouchListener() {
@@ -285,7 +295,7 @@ public class RecorderActivity extends MotherBrain {
 	private void sendFeedbackIntent() {
 		handler.removeCallbacks(updateTime);
 		handler.removeCallbacks(flashMic);
-		
+
 		Intent recordIntent = new Intent(context, Info.class);
 		recordIntent.putExtra("recordPath", filePath);
 		Bundle data = new Bundle();

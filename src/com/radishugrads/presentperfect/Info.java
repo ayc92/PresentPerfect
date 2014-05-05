@@ -29,7 +29,7 @@ import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-public class Info extends Activity {
+public class Info extends MotherBrain {
 	int actual_min;
 	int actual_sec;
 	int target_min;
@@ -71,6 +71,10 @@ public class Info extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_info);
+		
+		// format action bar
+		formatActionBar("Feedback");
+		
 		data = getIntent().getExtras();
 		actual_min = data.getInt("cur_time") / 60;
 		actual_sec = data.getInt("cur_time") % 60;
@@ -119,7 +123,7 @@ public class Info extends Activity {
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.info, menu);
+		getMenuInflater().inflate(R.menu.mother_brain, menu);
 		return true;
 	}
 	
