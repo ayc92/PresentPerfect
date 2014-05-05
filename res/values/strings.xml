@@ -12,7 +12,10 @@
     <string name="hello_world">Hello world!</string>
     <string name="create">Create!</string>
     <string name="cancel">Cancel</string>
+    
     <string name="instr">Press the microphone to begin recording!</string>
+    <string name="instr_2">Press the microphone to finish recording!</string>
+    
     <string name="title_activity_splash">SplashActivity</string>
     <string name="delete">Delete</string>
     <string name="action_share">Share</string>

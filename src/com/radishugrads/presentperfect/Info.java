@@ -284,7 +284,6 @@ public class SpinnerActivity1 extends Activity implements OnItemSelectedListener
 	    	words.clear();
 	    	counts.clear();
 	    	if (selected.equals("All")){
-	    		System.out.println("haha");
 				words.addAll(all_items);
 				counts.addAll(all_counts);
 				updateList();

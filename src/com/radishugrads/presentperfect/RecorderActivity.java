@@ -37,6 +37,7 @@ public class RecorderActivity extends MotherBrain {
 	ImageButton pauseButton;
 	ImageButton settingsButton;
 	TextView timeDisplay;
+	TextView instructions;
 	
 	// params and default params
 	Bundle params;
@@ -141,6 +142,7 @@ public class RecorderActivity extends MotherBrain {
 		pauseButton = (ImageButton) findViewById(R.id.pause_record);
 		settingsButton = (ImageButton) findViewById(R.id.settings_button);
 		timeDisplay = (TextView) findViewById(R.id.time_display);
+		instructions = (TextView) findViewById(R.id.instructions);
 		
 		timeDisplay.setText(String.format("%1$02d:%2$02d", timeInSecs / 60, timeInSecs % 60));
 		
@@ -350,8 +352,7 @@ public class RecorderActivity extends MotherBrain {
 			while(isRecording) {
 				bufReadResult = recorder.read(buffer, 0, buffer.length);
 				// TODO: make this into a track that can be played back
-				// System.out.println(audioTrack.write(buffer, 0, bufReadResult) + " bytes written to track.");
-				// System.out.println(bufReadResult);				
+								
 			}
 			recorder.stop();
 			return null;
@@ -382,6 +383,7 @@ public class RecorderActivity extends MotherBrain {
 						animEnabled = false;
 					}
 					setRecordButtonImage(endResource);
+					instructions.setText(R.string.instr_2);
 					// start timer/stopwatch
 					handler.postDelayed(updateTime, 800);
 					handler.postDelayed(flashMic, 200);

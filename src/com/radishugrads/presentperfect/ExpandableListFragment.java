@@ -75,7 +75,6 @@ public class ExpandableListFragment extends TabFragment {
         int SomeInt = getArguments().getInt("someInt", 0);   
         String someTitle = getArguments().getString("someTitle", "");
         tab = someTitle;
-        Log.d("WORKED: ", someTitle + " " + SomeInt);
     }
 	@Override
 	void setUpView() {
