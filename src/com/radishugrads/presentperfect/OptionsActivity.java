@@ -46,7 +46,7 @@ import android.widget.RadioGroup.OnCheckedChangeListener;
 import android.widget.TextView;
 import android.widget.TimePicker;
 
-public class OptionsActivity extends Activity {
+public class OptionsActivity extends MotherBrain {
 	int min;
 	EditText timeChosen;
 	ImageButton buzzwords;
@@ -65,11 +65,15 @@ public class OptionsActivity extends Activity {
 	TextView placeholder;
 	LinearLayout buzzList;
 	Bundle params;
-	
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_options);
+
+		// format action bar
+		formatActionBar("Options");
+
 		buzzList = (LinearLayout) findViewById(R.id.buzzList);
 		Intent intent = getIntent();
 		params = intent.getExtras();
@@ -79,7 +83,7 @@ public class OptionsActivity extends Activity {
 		good_items = params.getStringArrayList("good_items");
 		bad_items = params.getStringArrayList("bad_items");
 		all_items = params.getStringArrayList("all_items");
-		
+
 		deleteMode = false;
 		currList = 0;
 		buzzwords = (ImageButton) findViewById(R.id.wordslist);
@@ -107,7 +111,7 @@ public class OptionsActivity extends Activity {
 	            }
 	        });
 	}
-	
+
 	@Override
 	public void onBackPressed() {
 		Intent recordIntent = new Intent(this, RecorderActivity.class);
@@ -122,17 +126,17 @@ public class OptionsActivity extends Activity {
 		// int min = mIntent.getIntExtra("min", 0);
 		startActivity(recordIntent);
 	}
-	
+
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.options, menu);
+		getMenuInflater().inflate(R.menu.mother_brain, menu);
 		return true;
 	}
-	
+
 	public void addButtonListener(){
 		buzzwords.setOnClickListener(new OnClickListener() {
-			 
+
 			@Override
 			public void onClick(View view) {
 				deleteMode = false;
@@ -197,21 +201,21 @@ public class OptionsActivity extends Activity {
 								dialog.cancel();
 							}
 						});
-		 
+
 						// create alert dialog
 						AlertDialog alertDialog = alertDialogBuilder.create();
-		 
+
 						// show it
 						alertDialog.show();
-							
+
 
 				}
 			});
-		
-		
+
+
 		ImageButton trash = (ImageButton) findViewById(R.id.wordsdelete);
 		trash.setOnClickListener(new OnClickListener() {
-			 
+
 			@Override
 			public void onClick(View view) {
 				deleteMode = !deleteMode;
@@ -220,7 +224,7 @@ public class OptionsActivity extends Activity {
 			}
 		});
 	}
-	
+
 	public void addRadioListener(){
 		RadioGroup radioGroup = (RadioGroup) findViewById(R.id.timingOp);
 	    radioGroup.setOnCheckedChangeListener(new OnCheckedChangeListener() 
@@ -233,11 +237,11 @@ public class OptionsActivity extends Activity {
 	        	} else if (rstop.isChecked()){
 	        		timer = false;
 	        	}
-	        	
+
 	        }
 	    });
 	}
-	
+
 	public class buzzlistAdapter extends BaseAdapter implements ListAdapter {
 		private ArrayList<String> list; 
 		private Context context; 
@@ -305,7 +309,7 @@ public class OptionsActivity extends Activity {
 		} 
 		}
 public class SpinnerActivity2 extends Activity implements OnItemSelectedListener {
-	    
+
 	    public void onItemSelected(AdapterView<?> parent, View view, 
 	            int pos, long id) {
 	    	String selected = parent.getItemAtPosition(pos).toString();
@@ -342,6 +346,5 @@ public class SpinnerActivity2 extends Activity implements OnItemSelectedListener
 			  buzzList.addView(item);
 			}
 	}
-	  
-}
 
+}

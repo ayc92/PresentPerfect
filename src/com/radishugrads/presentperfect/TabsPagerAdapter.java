@@ -8,7 +8,7 @@ import android.app.FragmentTransaction;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
-
+import android.support.v4.app.ListFragment;
 public class TabsPagerAdapter extends FragmentPagerAdapter {
 	ArrayList<String> listDataHeader;
 	 HashMap<String, List<String>>listDataChild;
@@ -22,7 +22,7 @@ public class TabsPagerAdapter extends FragmentPagerAdapter {
 		System.out.println("called this");
 		// only the notifications tab is not an expandable list view
 		if (index == 0) {
-			return new ListFragment();
+			return new TabList();
 		} else if (index == 2){
 			ExpandableListFragment exp = ExpandableListFragment.newInstance(5, "shared");
 			return exp;
