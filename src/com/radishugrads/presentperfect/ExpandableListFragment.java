@@ -23,6 +23,8 @@ import android.widget.ExpandableListView;
 import android.widget.ExpandableListView.OnChildClickListener;
 import android.widget.ExpandableListView.OnGroupCollapseListener;
 import android.widget.ExpandableListView.OnGroupExpandListener;
+import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 
@@ -33,7 +35,6 @@ public class ExpandableListFragment extends TabFragment {
 	
 	private final int NONE_EXPANDED = -1;
     private int lastExpanded = NONE_EXPANDED;
-    public final static String ADD_BUTTON = "[  Add New Recording  ]";
     private final int ADD_CHILD = 0;
     private String newest_input = "";
     private boolean changed = false;
@@ -93,9 +94,10 @@ public class ExpandableListFragment extends TabFragment {
 	void setUp() {
 		addButton = (Button) currentTabView.findViewById(R.id.addProject);
 		delButton = (Button) currentTabView.findViewById(R.id.removeParent);
+		LinearLayout bottom_bar = (LinearLayout) currentTabView.findViewById(R.id.bottom_bar);
 		if (tab.equals("shared")){
-			addButton.setVisibility(View.GONE);
-//			delButton.setVisibility(View.GONE);
+			bottom_bar.setVisibility(View.GONE);
+			((FrameLayout) currentTabView.findViewById(R.id.list_bot_shadow)).setVisibility(View.GONE); //Bottom bar shadow
 		}
 		OnClickListener buttonListener = new OnClickListener() {
 			
@@ -108,8 +110,6 @@ public class ExpandableListFragment extends TabFragment {
 				case R.id.removeParent:
 					startRemove();
 					break;
-				case R.id.addRec:
-					//add(v, "child", groupPosition);
 				}
 			}
 		};
