@@ -65,6 +65,7 @@ public class ExpandableListFragment extends TabFragment {
     public ExpandableListFragment(){
     	
     }
+    
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
