@@ -37,6 +37,7 @@ public class RecorderActivity extends MotherBrain {
 	ImageButton pauseButton;
 	ImageButton settingsButton;
 	TextView timeDisplay;
+	TextView instructions;
 	
 	// params and default params
 	Bundle params;
@@ -141,75 +142,24 @@ public class RecorderActivity extends MotherBrain {
 		pauseButton = (ImageButton) findViewById(R.id.pause_record);
 		settingsButton = (ImageButton) findViewById(R.id.settings_button);
 		timeDisplay = (TextView) findViewById(R.id.time_display);
+		instructions = (TextView) findViewById(R.id.instructions);
 		
 		timeDisplay.setText(String.format("%1$02d:%2$02d", timeInSecs / 60, timeInSecs % 60));
 		
-		// initialize settings button onclick
-		settingsButton.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				Intent recordIntent = new Intent(context, OptionsActivity.class);
-	        	recordIntent.putExtras(params);
-	    		startActivity(recordIntent);
-			}
-		});
+		// initialize settings button onclick		
+		// last two args not used
+		settingsButton.setOnTouchListener(new SettingsButtonOnTouchListener(R.drawable.settings,
+				R.drawable.settings_down, 0, 0));
 		
 		// initialize button images to handle press and hold
-		recordButton.setOnTouchListener(new View.OnTouchListener() {
-			@Override
-			public boolean onTouch(View v, MotionEvent event) {
-				if (event.getAction() == android.view.MotionEvent.ACTION_DOWN) {
-					if (isRecording) {
-						setRecordButtonImage(R.drawable.new_record_button_active_pressed);
-					} else {
-						setRecordButtonImage(R.drawable.new_record_button_pressed);
-					}
-				} else {
-					if (isRecording || isPaused) {
-						setRecordButtonImage(R.drawable.new_record_button);
-						sendFeedbackIntent();
-					} else {
-						if (animEnabled) {
-							slideButtons();
-							animEnabled = false;
-						}
-						setRecordButtonImage(R.drawable.new_record_button_active);
-						// start timer/stopwatch
-						handler.postDelayed(updateTime, 800);
-						handler.postDelayed(flashMic, 200);
-						
-						// TODO: speech recognition
-					}
-					isRecording = !isRecording;
-				}
-				return false;
-			}
-		});
-		pauseButton.setOnTouchListener(new View.OnTouchListener() {
-			@Override
-			public boolean onTouch(View v, MotionEvent event) {
-				if (event.getAction() == android.view.MotionEvent.ACTION_DOWN) {
-					if (isRecording) {
-						pauseButton.setImageResource(R.drawable.new_pause_button_pressed);
-					} else {
-						pauseButton.setImageResource(R.drawable.new_play_button_pressed);
-					}
-				} else {
-					if (isRecording) {
-						pauseButton.setImageResource(R.drawable.new_play_button);
-						handler.removeCallbacks(updateTime);
-						handler.removeCallbacks(flashMic);
-					} else {
-						pauseButton.setImageResource(R.drawable.new_pause_button);
-						handler.postDelayed(updateTime, 800);
-						handler.postDelayed(flashMic, 200);
-					}
-					isPaused = !isPaused;
-					isRecording = !isRecording;
-				}
-				return false;
-			}
-		});
+		recordButton.setOnTouchListener(new RecordButtonOnTouchListener(R.drawable.new_record_button,
+				R.drawable.new_record_button_pressed,
+				R.drawable.new_record_button_active,
+				R.drawable.new_record_button_active_pressed));
+		pauseButton.setOnTouchListener(new PauseButtonOnTouchListener(R.drawable.new_pause_button,
+				R.drawable.new_pause_button_pressed,
+				R.drawable.new_play_button,
+				R.drawable.new_play_button_pressed));
 		
 		// setup animations
 		slideLeft = new TranslateAnimation (
@@ -302,14 +252,16 @@ public class RecorderActivity extends MotherBrain {
 		data.putBoolean("is_timer", isTimer);
 		if (!isTimer) {
 			data.putBoolean("over_time", timeInSecs > timeLimit);
+			data.putInt("cur_time", timeInSecs);
 		} else {
 			data.putBoolean("over_time", timeInSecs <= 0);
+			data.putInt("cur_time", timeLimit - timeInSecs);
 		}
 		data.putSerializable("good", goodWordCounts);
 		data.putSerializable("bad", badWordCounts);
 		data.putSerializable("all", allWordCounts);
 		data.putSerializable("wpm", wordsPerMin);
-		data.putInt("cur_time", timeInSecs);
+		
 		data.putInt("time_limit", timeLimit);
 		recordIntent.putExtras(data);
 		startActivity(recordIntent);
@@ -400,11 +352,99 @@ public class RecorderActivity extends MotherBrain {
 			while(isRecording) {
 				bufReadResult = recorder.read(buffer, 0, buffer.length);
 				// TODO: make this into a track that can be played back
-				// System.out.println(audioTrack.write(buffer, 0, bufReadResult) + " bytes written to track.");
-				// System.out.println(bufReadResult);				
+								
 			}
 			recorder.stop();
 			return null;
 		}
+	}
+	
+	private class RecordButtonOnTouchListener extends ButtonOnTouchListener {
+
+		public RecordButtonOnTouchListener(int s, int ds, int e, int de) {
+			super(s, ds, e, de);
+		}
+
+		@Override
+		public boolean onTouch(View v, MotionEvent event) {
+			if (event.getAction() == android.view.MotionEvent.ACTION_DOWN) {
+				if (isRecording) {
+					setRecordButtonImage(downEndResource);
+				} else {
+					setRecordButtonImage(downStartResource);
+				}
+			} else {
+				if (isRecording || isPaused) {
+					setRecordButtonImage(startResource);
+					sendFeedbackIntent();
+				} else {
+					if (animEnabled) {
+						slideButtons();
+						animEnabled = false;
+					}
+					setRecordButtonImage(endResource);
+					instructions.setText(R.string.instr_2);
+					// start timer/stopwatch
+					handler.postDelayed(updateTime, 800);
+					handler.postDelayed(flashMic, 200);
+					
+					// TODO: speech recognition
+				}
+				isRecording = !isRecording;
+			}
+			return false;
+		}
+	}
+	
+	private class PauseButtonOnTouchListener extends ButtonOnTouchListener {
+
+		public PauseButtonOnTouchListener(int s, int ds, int e, int de) {
+			super(s, ds, e, de);
+		}
+
+		@Override
+		public boolean onTouch(View v, MotionEvent event) {
+			if (event.getAction() == android.view.MotionEvent.ACTION_DOWN) {
+				if (isRecording) {
+					pauseButton.setImageResource(downStartResource);
+				} else {
+					pauseButton.setImageResource(downEndResource);
+				}
+			} else {
+				if (isRecording) {
+					pauseButton.setImageResource(downEndResource);
+					handler.removeCallbacks(updateTime);
+					handler.removeCallbacks(flashMic);
+				} else {
+					pauseButton.setImageResource(downStartResource);
+					handler.postDelayed(updateTime, 800);
+					handler.postDelayed(flashMic, 200);
+				}
+				isPaused = !isPaused;
+				isRecording = !isRecording;
+			}
+			return false;
+		}
+	}
+	
+	private class SettingsButtonOnTouchListener extends ButtonOnTouchListener {
+
+		public SettingsButtonOnTouchListener(int s, int ds, int e, int de) {
+			super(s, ds, e, de);
+		}
+
+		@Override
+		public boolean onTouch(View v, MotionEvent event) {
+			if (event.getAction() == android.view.MotionEvent.ACTION_DOWN) {
+				settingsButton.setImageResource(downStartResource);
+			} else {
+				settingsButton.setImageResource(startResource);
+				Intent recordIntent = new Intent(context, OptionsActivity.class);
+	        	recordIntent.putExtras(params);
+	    		startActivity(recordIntent);
+			}
+			return false;
+		}
+		
 	}
 }
