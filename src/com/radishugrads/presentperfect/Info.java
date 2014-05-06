@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 
 import android.app.Activity;
@@ -14,6 +15,8 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -30,7 +33,7 @@ import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-public class Info extends MotherBrain {
+public class Info extends MotherBrain implements Handler.Callback {
 	int actual_min;
 	int actual_sec;
 	int target_min;
@@ -69,6 +72,7 @@ public class Info extends MotherBrain {
 	
 	private MediaPlayer mPlayer = null;
 	String filePath = null;
+	Handler handler = new Handler(this);
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -113,7 +117,7 @@ public class Info extends MotherBrain {
 		if (!over_time) {
 			time_f.setText(String.format("Speech time: %1$02d:%2$02d", actual_min, actual_sec));
 		}
-		if (wpm > 150 || wpm < 130){
+		if (wpm > 150 || wpm < 90){
 			speed_f.setBackgroundColor(Color.parseColor("#D22027"));
 		}
 		speed_f.setText("Speed: " + wpm + " wpm");
@@ -131,8 +135,8 @@ public class Info extends MotherBrain {
 		spinner1 = (Spinner) findViewById(R.id.spinner1);
 		spinner1.setOnItemSelectedListener(new SpinnerActivity1());
 		updateList_comments();
-		filePath = getFilesDir() + "/audiotest.3gp";
-		
+		filePath = getIntent().getStringExtra("recordPath");
+		speechToText();
 	}
 
 	@Override
@@ -367,17 +371,18 @@ public class SpinnerActivity1 extends Activity implements OnItemSelectedListener
 	}
 	
 	public void updateList(){
+		Log.d("asdf", "starting updateList()");
 		LinearLayout countList = (LinearLayout) findViewById(R.id.countList);
 		countList.removeAllViews();
 		LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		for (int i = 0; i < counts.size(); i++){
 			View view;
-		    Log.d("OOOO", "INNNNN"); 
+//		    Log.d("OOOO", "INNNNN"); 
 		    view = inflater.inflate(R.layout.wordcountlist, null);
-		    Log.d("OOOO", "INNNN222");
+//		    Log.d("OOOO", "INNNN222");
 		    TextView listNum = (TextView)view.findViewById(R.id.numbercount); 
 		    listNum.setText("" + counts.get(i));
-		    Log.d("OOOO", "IN 33333");
+//		    Log.d("OOOO", "IN 33333");
 		    TextView listWord = (TextView)view.findViewById(R.id.wordofnum); 
 		    listWord.setText(words.get(i));
 		    countList.addView(view);
@@ -389,17 +394,62 @@ public class SpinnerActivity1 extends Activity implements OnItemSelectedListener
 		LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		for (int i = 0; i < comments.length; i++){
 			View view;
-		    Log.d("OOOO", "INNNNN"); 
+//		    Log.d("OOOO", "INNNNN"); 
 		    view = inflater.inflate(R.layout.commentslist, null);
-		    Log.d("OOOO", "INNNN222");
+//		    Log.d("OOOO", "INNNN222");
 		    TextView listUser = (TextView)view.findViewById(R.id.commentuser); 
 		    listUser.setText("Bob says"); 
-		    Log.d("OOOO", "IN 33333");
+//		    Log.d("OOOO", "IN 33333");
 		    TextView listComment = (TextView)view.findViewById(R.id.commenttext); 
 		    listComment.setText(comments[i]);
 		    comment_view.addView(view);
 		}
 		  
+	}
+	
+	private void speechToText() {
+		RecognitionV2 r = new RecognitionV2(handler, filePath);
+		new Thread(r, "Speech2Text thread").start();
+	}
+	
+	public boolean handleMessage(Message msg) {
+		String transcription = (String) msg.obj;
+		Log.d("asdf", "Transcription: " + transcription);
+		String[] wordArray = transcription.split(" ");
+		int numWds = wordArray.length;
+		wpm = (int) (numWds / (actual_min + (actual_sec / 60.0)));
+		((TextView) findViewById(R.id.wordspermin)).setText("Speed: "+wpm+" wpm");
+		// buzzword counts
+		int[] goodCount = new int[good_items.size()];
+		int[] badCount = new int[bad_items.size()];
+		for(String word : wordArray) {
+			for(int i = 0; i < good_items.size(); i++) {
+				if( word.toLowerCase().equals(good_items.get(i).toLowerCase()) ) {
+					goodCount[i] ++;
+				}
+			}
+			for(int i = 0; i < bad_items.size(); i++) {
+				if( word.toLowerCase().equals(bad_items.get(i).toLowerCase()) ) {
+					badCount[i] ++;
+				}
+			}
+		}
+		good_counts = new ArrayList<Integer>();
+		for(int c : goodCount) {
+			good_counts.add(c);
+		}
+		bad_counts = new ArrayList<Integer>();
+		for(int c : badCount) {
+			bad_counts.add(c);
+		}
+		all_items = new ArrayList<String>();
+		all_items.addAll(good_items);
+		all_items.addAll(bad_items);
+		all_counts = new ArrayList<Integer>();
+		all_counts.addAll(good_counts);
+		all_counts.addAll(bad_counts);
+		updateList();
+		return true;
 	}
 
 }
