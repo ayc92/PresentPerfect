@@ -13,9 +13,14 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
+import android.media.MediaPlayer;
+import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -44,10 +49,16 @@ public class Info extends Activity {
 	boolean wordVisib;
 	boolean commentVisib;
 	boolean notesVisib;
+	boolean isPlaying;
+	boolean changeImage = false;
+	Handler myHandler;
 	ImageView arrow1;
 	ImageView arrow2;
 	ImageView arrow3;
-	ArrayList<String> counts;
+	ImageView mediaButton;
+	int currentImage;
+	ArrayList<String> words;
+	ArrayList<Integer> counts;
 	ArrayList<String> chosen_contacts;
 	wordCountAdapter adapter;
 	String contacts[] = {"Marie Antoinette", "George Orwell", "Clifford", "my mom"};
@@ -66,7 +77,34 @@ public class Info extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_info);
-		tempHardcode();
+		// format action bar
+		formatActionBar("Feedback");
+		myHandler = new Handler();
+		
+		data = getIntent().getExtras();
+		is_timer = data.getBoolean("is_timer");
+		actual_min = data.getInt("cur_time") / 60;
+		actual_sec = data.getInt("cur_time") % 60;
+		target_min = data.getInt("time_limit") / 60;
+		target_sec = data.getInt("time_limit") % 60;
+		over_time = data.getBoolean("over_time");
+		wpm = data.getInt("wpm");
+		good_items = new ArrayList<String>(((HashMap<String, Integer>) data.getSerializable("good")).keySet());
+		good_counts = new ArrayList<Integer>(((HashMap<String, Integer>) data.getSerializable("good")).values());
+		
+		bad_items = new ArrayList<String>(((HashMap<String, Integer>) data.getSerializable("bad")).keySet());
+		bad_counts = new ArrayList<Integer>(((HashMap<String, Integer>) data.getSerializable("bad")).values());
+		
+		all_items = new ArrayList<String>(((HashMap<String, Integer>) data.getSerializable("all")).keySet());
+		all_counts = new ArrayList<Integer>(((HashMap<String, Integer>) data.getSerializable("all")).values());
+		
+		words = new ArrayList<String>();
+		words.addAll(all_items);
+		counts = new ArrayList<Integer>();
+		counts.addAll(all_counts);
+		updateList();
+		
+		mediaButton = (ImageView) findViewById(R.id.playrec);
 		time_f = (TextView) findViewById(R.id.speechtime);
 		speed_f = (TextView) findViewById(R.id.wordspermin);
 		if (actual_hour > target_hour || (actual_hour == target_hour && actual_min > target_min)){
@@ -97,6 +135,12 @@ public class Info extends Activity {
 //		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 //		spinner1.setAdapter(adapter);
 		spinner1.setOnItemSelectedListener(new SpinnerActivity1());
+		updateList_comments();
+		filePath = getFilesDir() + "/audiotest.3gp";
+		mediaButton.setOnTouchListener(new playbackButtonOnTouchListener(R.drawable.playb,  
+				R.drawable.playb_pressed, 
+				R.drawable.pauseb,
+				R.drawable.pauseb_pressed));
 		
 //		Intent intent = getIntent();
 //		filePath = intent.getExtras().getString("recordPath");
@@ -308,5 +352,95 @@ public class SpinnerActivity1 extends Activity implements OnItemSelectedListener
             Log.e("", "prepare() failed");
         }
 	}
+	
+	public void updateList(){
+		LinearLayout countList = (LinearLayout) findViewById(R.id.countList);
+		countList.removeAllViews();
+		LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+		for (int i = 0; i < counts.size(); i++){
+			View view;
+		    Log.d("OOOO", "INNNNN"); 
+		    view = inflater.inflate(R.layout.wordcountlist, null);
+		    Log.d("OOOO", "INNNN222");
+		    TextView listNum = (TextView)view.findViewById(R.id.numbercount); 
+		    listNum.setText("" + counts.get(i));
+		    Log.d("OOOO", "IN 33333");
+		    TextView listWord = (TextView)view.findViewById(R.id.wordofnum); 
+		    listWord.setText(words.get(i));
+		    countList.addView(view);
+		}
+		  
+	}
+	public void updateList_comments(){
+		comment_view.removeAllViews();
+		LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+		for (int i = 0; i < comments.length; i++){
+			View view;
+		    Log.d("OOOO", "INNNNN"); 
+		    view = inflater.inflate(R.layout.commentslist, null);
+		    Log.d("OOOO", "INNNN222");
+		    TextView listUser = (TextView)view.findViewById(R.id.commentuser); 
+		    listUser.setText("Bob says"); 
+		    Log.d("OOOO", "IN 33333");
+		    TextView listComment = (TextView)view.findViewById(R.id.commenttext); 
+		    listComment.setText(comments[i]);
+		    comment_view.addView(view);
+		}
+		  
+	}
+	
+	private Runnable finishPush = new Runnable() {
+		public void run() {
+			switch (currentImage) {
+				case R.drawable.playb_pressed:
+					System.out.println("Changing to pause");
+					mediaButton.setImageResource(R.drawable.pauseb);
+					break;
+				case R.drawable.pauseb_pressed:
+					System.out.println("Changing to play");
+					mediaButton.setImageResource(R.drawable.playb);
+					break;
+					
+			}
+		}
+	};
+	
+	private void changeImage(int ID) {
+		mediaButton.setImageResource(ID);
+		currentImage = ID;
+	}
+	
+	private class playbackButtonOnTouchListener extends ButtonOnTouchListener {
+		
+		public playbackButtonOnTouchListener(int s, int ds, int e, int de) {
+			super(s, ds, e, de);
+		}
+		
+		@Override
+		public boolean onTouch(View v, MotionEvent event) {
+			if (event.getAction() == android.view.MotionEvent.ACTION_DOWN) {
+				System.out.println("Action DOWN");
+				if (isPlaying) { //Pause Button Showing
+					System.out.println("isPlaying is true");
+					changeImage(downEndResource);
+				} else { //Play Button Showing
+					System.out.println("isPlaying is false");
+					changeImage(downStartResource);
+				}
+				changeImage = true;
+			}
+			else {
+				System.out.println("Action UP");
+				if (changeImage) {
+				myHandler.postDelayed(finishPush, 200);
+				}
+				changeImage = false;
+				
+				isPlaying = !isPlaying;
+			} 
+			return false;
+		}
+	}
+
 
 }
