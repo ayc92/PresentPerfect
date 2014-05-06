@@ -485,7 +485,7 @@ public class SpinnerActivity1 extends Activity implements OnItemSelectedListener
 	}
 	
 	public void onCompletion(MediaPlayer mp) {
-		((ImageButton) findViewById(R.id.playrec)).performClick();
+		((ImageView) findViewById(R.id.playrec)).performClick();
 		playbackStop();
 	}
 
