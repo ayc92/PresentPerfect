@@ -22,6 +22,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -49,9 +50,14 @@ public class Info extends MotherBrain implements Handler.Callback {
 	boolean wordVisib;
 	boolean commentVisib;
 	boolean notesVisib;
+	boolean isPlaying = false;
+	boolean changeImage = false;
+	Handler myHandler;
 	ImageView arrow1;
 	ImageView arrow2;
 	ImageView arrow3;
+	ImageView mediaButton;
+	int currentImage;
 	ArrayList<String> words;
 	ArrayList<Integer> counts;
 	ArrayList<String> chosen_contacts;
@@ -80,6 +86,7 @@ public class Info extends MotherBrain implements Handler.Callback {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_info);
 		
+		myHandler = new Handler();
 		data = getIntent().getExtras();
 		// format action bar
 		formatActionBar("Feedback for " + data.getString("rec_name"));
@@ -105,6 +112,8 @@ public class Info extends MotherBrain implements Handler.Callback {
 		counts.addAll(all_counts);
 		updateList();
 		
+		mediaButton = (ImageView) findViewById(R.id.playrec);
+
 		time_f = (TextView) findViewById(R.id.speechtime);
 		speed_f = (TextView) findViewById(R.id.wordspermin);
 		if (over_time){
@@ -139,6 +148,10 @@ public class Info extends MotherBrain implements Handler.Callback {
 		File dir = new File(Environment.getExternalStorageDirectory().getPath(), "PresentPerfect");
 		filePath = dir + "/" + getIntent().getStringExtra("rec_name") + ".wav";
 		speechToText();
+		mediaButton.setOnTouchListener(new playbackButtonOnTouchListener(R.drawable.playb,  
+				R.drawable.playb_pressed, 
+				R.drawable.pauseb,
+				R.drawable.pauseb_pressed));
 	}
 
 	@Override
@@ -357,8 +370,7 @@ public class SpinnerActivity1 extends Activity implements OnItemSelectedListener
 			alertDialog.show();
 	}
 
-	public void playback(View v) {
-		//Change play button to pause here
+	public void playback() {
 		mPlayer = new MediaPlayer();
         try {
 			File mFile = new File(filePath);
@@ -457,6 +469,62 @@ public class SpinnerActivity1 extends Activity implements OnItemSelectedListener
 		all_counts.addAll(bad_counts);
 		updateList();
 		return true;
+	}
+
+		
+	private Runnable finishPush = new Runnable() {
+		public void run() {
+			switch (currentImage) {
+				case R.drawable.playb_pressed:
+					if (mPlayer == null) {
+						playback();
+					} else {
+						mPlayer.start();
+					}
+					mediaButton.setImageResource(R.drawable.pauseb);
+					break;
+				case R.drawable.pauseb_pressed:
+					if (mPlayer != null && mPlayer.isPlaying()) {
+						mPlayer.stop();
+					}
+					mediaButton.setImageResource(R.drawable.playb);
+					break;
+					
+			}
+		}
+		
+	};
+	
+	private void changeImage(int ID) {
+		mediaButton.setImageResource(ID);
+		currentImage = ID;
+	}
+	
+	private class playbackButtonOnTouchListener extends ButtonOnTouchListener {
+		
+		public playbackButtonOnTouchListener(int s, int ds, int e, int de) {
+			super(s, ds, e, de);
+		}
+		
+		@Override
+		public boolean onTouch(View v, MotionEvent event) {
+			if (event.getAction() == android.view.MotionEvent.ACTION_DOWN) {
+				if (isPlaying) { //Pause Button Showing
+					changeImage(downEndResource);
+				} else { //Play Button Showing
+					changeImage(downStartResource);
+				}
+				changeImage = true;
+			}
+			else {
+				if (changeImage) {
+					myHandler.postDelayed(finishPush, 200);
+					changeImage = false;
+					isPlaying = !isPlaying;
+				}
+			} 
+			return false;
+		}
 	}
 
 }

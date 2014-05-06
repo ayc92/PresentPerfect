@@ -24,6 +24,7 @@
         android:layout_height="5dp"
         android:background="@drawable/shadow_2" >
          </FrameLayout>
+
     	<LinearLayout
     	    android:id="@+id/bottom_bar"
     	    android:layout_width="fill_parent"
@@ -56,6 +57,5 @@
     	        android:textColor="@color/background"
     	        android:background="@color/mod_black"/>
     	</LinearLayout>
-   		
                 
 </RelativeLayout>
