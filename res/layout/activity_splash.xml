@@ -14,13 +14,13 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
-        android:src="@drawable/logo_black" />
+        android:src="@drawable/logo_fancy" />
  
     <TextView
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:textSize="20dp"
-        android:textColor="#000000"
+        android:textSize="20sp"
+        android:textColor="#ffffff"
         android:gravity="center_horizontal"
         android:layout_alignTop="@id/imgLogo"
         android:layout_marginTop="125dp"
