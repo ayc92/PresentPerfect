@@ -107,6 +107,8 @@ public class Info extends MotherBrain {
 			time_f.setBackgroundColor(Color.parseColor("#D22027"));
 			if (is_timer) {
 				time_f.setText(String.format("%1$02d:%2$02d is up!", target_min, target_sec));
+			} else {
+				time_f.setText(String.format("Speech time: %1$02d:%2$02d", actual_min, actual_sec));
 			}
 		}
 		if (!over_time) {
@@ -131,6 +133,7 @@ public class Info extends MotherBrain {
 		spinner1.setOnItemSelectedListener(new SpinnerActivity1());
 		updateList_comments();
 		filePath = getFilesDir() + "/audiotest.3gp";
+		
 	}
 
 	@Override
@@ -350,6 +353,7 @@ public class SpinnerActivity1 extends Activity implements OnItemSelectedListener
 	}
 
 	public void playback(View v) {
+		//Change play button to pause here
 		mPlayer = new MediaPlayer();
         try {
 			File mFile = new File(filePath);
