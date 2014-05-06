@@ -107,6 +107,8 @@ public class Info extends MotherBrain {
 			time_f.setBackgroundColor(Color.parseColor("#D22027"));
 			if (is_timer) {
 				time_f.setText(String.format("%1$02d:%2$02d is up!", target_min, target_sec));
+			} else {
+				time_f.setText(String.format("Speech time: %1$02d:%2$02d", actual_min, actual_sec));
 			}
 		}
 		if (!over_time) {
