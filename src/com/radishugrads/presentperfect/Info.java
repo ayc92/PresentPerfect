@@ -4,9 +4,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 
-import android.media.MediaPlayer;
-import android.os.Bundle;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
@@ -24,7 +23,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
+import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -32,20 +31,19 @@ import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.AdapterView.OnItemSelectedListener;
 
-public class Info extends Activity {
-	int actual_hour;
+public class Info extends MotherBrain {
 	int actual_min;
-	int target_hour;
+	int actual_sec;
 	int target_min;
+	int target_sec;
 	int wpm;
 	TextView time_f;
 	TextView speed_f;
 	Object recording;
 	
 	ListView listcount;
-	ListView comment_view;
+	LinearLayout comment_view;
 	boolean wordVisib;
 	boolean commentVisib;
 	boolean notesVisib;
@@ -62,21 +60,28 @@ public class Info extends Activity {
 	ArrayList<String> chosen_contacts;
 	wordCountAdapter adapter;
 	String contacts[] = {"Marie Antoinette", "George Orwell", "Clifford", "my mom"};
-	String s2[] = {"work a little more on your enthusiasm. good use of stories", "7/10 needs more oomph"};
+	String comments[] = {"work a little more on your enthusiasm. good use of stories", "7/10 needs more oomph"};
 	Spinner spinner1;
 	LinearLayout firstPanel;
 	LinearLayout notes;
-	ArrayList<String> good_items = new ArrayList<String>();
-	ArrayList<String> bad_items = new ArrayList<String>();
-	ArrayList<String> all_items = new ArrayList<String>();
+	ArrayList<String> good_items;
+	ArrayList<String> bad_items;
+	ArrayList<String> all_items;
+	ArrayList<Integer> good_counts;
+	ArrayList<Integer> bad_counts;
+	ArrayList<Integer> all_counts;
+	boolean is_timer;
+	boolean over_time;
+	Bundle data;
 	
-	private MediaPlayer   mPlayer = null;
+	private MediaPlayer mPlayer = null;
 	String filePath = null;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_info);
+		
 		// format action bar
 		formatActionBar("Feedback");
 		myHandler = new Handler();
@@ -105,12 +110,18 @@ public class Info extends Activity {
 		updateList();
 		
 		mediaButton = (ImageView) findViewById(R.id.playrec);
+
 		time_f = (TextView) findViewById(R.id.speechtime);
 		speed_f = (TextView) findViewById(R.id.wordspermin);
-		if (actual_hour > target_hour || (actual_hour == target_hour && actual_min > target_min)){
+		if (over_time){
 			time_f.setBackgroundColor(Color.parseColor("#D22027"));
+			if (is_timer) {
+				time_f.setText(String.format("%1$02d:%2$02d is up!", target_min, target_sec));
+			}
 		}
-		time_f.setText("Speech time: " + actual_hour + ":" + actual_min);
+		if (!over_time) {
+			time_f.setText(String.format("Speech time: %1$02d:%2$02d", actual_min, actual_sec));
+		}
 		if (wpm > 150 || wpm < 130){
 			speed_f.setBackgroundColor(Color.parseColor("#D22027"));
 		}
@@ -122,20 +133,14 @@ public class Info extends Activity {
 		chosen_contacts = new ArrayList<String>();
 		firstPanel = (LinearLayout) findViewById(R.id.firstPanel);
 		notes = (LinearLayout) findViewById(R.id.thirdPanel);
-		listcount = (ListView) findViewById(R.id.listcount);
-		adapter = new wordCountAdapter(counts, this);
-		listcount.setAdapter(adapter);
-		comment_view = (ListView) findViewById(R.id.commentlist);
-		comment_view.setAdapter(new ArrayAdapter<String> (this, android.R.layout.simple_list_item_1, s2));
+		comment_view = (LinearLayout) findViewById(R.id.commentlist);
 		arrow1 = (ImageView) findViewById(R.id.imageView2);
 		arrow2 = (ImageView) findViewById(R.id.imageView3);
 		arrow3 = (ImageView) findViewById(R.id.imageView4);
 		spinner1 = (Spinner) findViewById(R.id.spinner1);
-//		ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this, R.array.word_choices, android.R.layout.simple_spinner_item);
-//		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-//		spinner1.setAdapter(adapter);
 		spinner1.setOnItemSelectedListener(new SpinnerActivity1());
 		updateList_comments();
+
 		filePath = getFilesDir() + "/audiotest.3gp";
 		mediaButton.setOnTouchListener(new playbackButtonOnTouchListener(R.drawable.playb,  
 				R.drawable.playb_pressed, 
@@ -144,7 +149,7 @@ public class Info extends Activity {
 		
 //		Intent intent = getIntent();
 //		filePath = intent.getExtras().getString("recordPath");
-		filePath = getFilesDir() + "/audiotest.3gp";
+		
 	}
 
 	@Override
@@ -155,36 +160,69 @@ public class Info extends Activity {
 	}
 	
 	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+			case R.id.action_share:
+				AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
+						this);
+
+				// set title
+				alertDialogBuilder.setTitle("Contacts to share with")
+					.setCancelable(false)
+					.setMultiChoiceItems(contacts, null,
+		                      new DialogInterface.OnMultiChoiceClickListener() {
+		               @Override
+		               public void onClick(DialogInterface dialog, int which,
+		                       boolean isChecked) {
+		                   if (isChecked) {
+		                       // If the user checked the item, add it to the selected items
+		                	   Log.d("ADDED: ", ""+contacts[which]);
+		                       chosen_contacts.add(contacts[which]);
+		                   } else if (chosen_contacts.contains(contacts[which])) {
+		                       // Else, if the item is already in the array, remove it 
+		                	   Log.d("REMOVED: ", ""+contacts[which]);
+		                       chosen_contacts.remove(contacts[which]);
+		                   }
+		               }
+		           })
+					.setPositiveButton("Done",new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog,int id) {
+							// if this button is clicked, close
+							// current activity
+							//MainActivity.this.finish();
+							
+						}
+					  })
+					.setNegativeButton("Cancel",new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog,int id) {
+							// if this button is clicked, just close
+							// the dialog box and do nothing
+							dialog.cancel();
+						}
+					});
+
+					// create alert dialog
+					AlertDialog alertDialog = alertDialogBuilder.create();
+
+					// show it
+					alertDialog.show();
+					break;
+		}
+		return false;
+	}
+	
+	@Override
 	public void onBackPressed() {
 		Intent recordIntent = new Intent(this, RecList.class);
 		startActivity(recordIntent);
 		finish();
 	}
 	
-	public void tempHardcode(){
-		actual_hour = 0;
-		actual_min = 14;
-		target_hour = 0;
-		target_min = 13;
-		wpm = 120;
-		counts = new ArrayList<String>();
-		counts.add("like");
-		counts.add("um");
-		counts.add("user generated content");
-		all_items = new ArrayList<String>();
-		all_items.add("like");
-		all_items.add("um");
-		all_items.add("user generated content");
-	}
 	public void toggle_contents(View v){
 		if (wordVisib){
-//			listcount.setVisibility(View.GONE);
-//			spinner1.setVisibility(View.GONE);
 			firstPanel.setVisibility(View.GONE);
 			arrow1.setImageResource(R.drawable.arrowdownblue);
 		} else {
-//	      listcount.setVisibility(View.VISIBLE);
-//	      spinner1.setVisibility(View.VISIBLE);
 			firstPanel.setVisibility(View.VISIBLE);
 	      arrow1.setImageResource(R.drawable.arrowupblue);
 		}
@@ -244,11 +282,11 @@ public class Info extends Activity {
 		public View getView(final int position, View convertView, ViewGroup parent) {
 		    View view;
 		    Log.d("OOOO", "INNNNN");
-		        LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE); 
-		        view = inflater.inflate(R.layout.wordcountlist, null);
-		        Log.d("OOOO", "INNNN222");
+	        LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE); 
+	        view = inflater.inflate(R.layout.wordcountlist, null);
+	        Log.d("OOOO", "INNNN222");
 		    TextView listNum = (TextView)view.findViewById(R.id.numbercount); 
-		    listNum.setText(position+" "); 
+		    listNum.setText(position+""); 
 		    Log.d("OOOO", "IN 33333");
 		    TextView listWord = (TextView)view.findViewById(R.id.wordofnum); 
 		    listWord.setText(list.get(position)); 
@@ -256,30 +294,27 @@ public class Info extends Activity {
 		} 
 		}
 	
-	public void hardcoded(){
-		counts = new ArrayList<String>();
-		counts.add("like");
-		counts.add("um");
-		counts.add("user generated content");
-	}
 	
 public class SpinnerActivity1 extends Activity implements OnItemSelectedListener {
 	    
 	    public void onItemSelected(AdapterView<?> parent, View view, 
 	            int pos, long id) {
 	    	String selected = parent.getItemAtPosition(pos).toString();
+	    	words.clear();
+	    	counts.clear();
 	    	if (selected.equals("All")){
-				counts.clear();
-				counts.addAll(all_items);
-				adapter.notifyDataSetChanged();
+	    		System.out.println("haha");
+				words.addAll(all_items);
+				counts.addAll(all_counts);
+				updateList();
 	    	} else if (selected.equals("Avoid")) {
-				counts.clear();
-				counts.addAll(bad_items);
-				adapter.notifyDataSetChanged();
+				words.addAll(bad_items);
+				counts.addAll(bad_counts);
+				updateList();
 	    	} else if (selected.equals("Incorporate")) {
-				counts.clear();
-				counts.addAll(good_items);
-				adapter.notifyDataSetChanged();
+				words.addAll(good_items);
+				counts.addAll(good_counts);
+				updateList();
 	    	}
 	    }
 
@@ -291,12 +326,7 @@ public class SpinnerActivity1 extends Activity implements OnItemSelectedListener
 	
 		AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
 				this);
-		LayoutInflater inflater = getLayoutInflater();
 
-    // Inflate and set the layout for the dialog
-    // Pass null as the parent view because its going in the dialog layout
-//	final View v = inflater.inflate(R.layout.buzzworddialog, null);
-//	alertDialogBuilder.setView(v);
 		// set title
 		alertDialogBuilder.setTitle("Contacts to share with")
 			.setCancelable(false)
@@ -340,6 +370,7 @@ public class SpinnerActivity1 extends Activity implements OnItemSelectedListener
 	}
 
 	public void playback(View v) {
+		//Change play button to pause here
 		mPlayer = new MediaPlayer();
         try {
 			File mFile = new File(filePath);
@@ -441,6 +472,5 @@ public class SpinnerActivity1 extends Activity implements OnItemSelectedListener
 			return false;
 		}
 	}
-
 
 }

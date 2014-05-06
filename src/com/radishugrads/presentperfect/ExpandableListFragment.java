@@ -1,5 +1,6 @@
 package com.radishugrads.presentperfect;
 
+import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -11,6 +12,8 @@ import java.util.Map;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.WindowManager.LayoutParams;
@@ -20,6 +23,8 @@ import android.widget.ExpandableListView;
 import android.widget.ExpandableListView.OnChildClickListener;
 import android.widget.ExpandableListView.OnGroupCollapseListener;
 import android.widget.ExpandableListView.OnGroupExpandListener;
+import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 
@@ -30,7 +35,6 @@ public class ExpandableListFragment extends TabFragment {
 	
 	private final int NONE_EXPANDED = -1;
     private int lastExpanded = NONE_EXPANDED;
-    public final static String ADD_BUTTON = "[  Add New Recording  ]";
     private final int ADD_CHILD = 0;
     private String newest_input = "";
     private boolean changed = false;
@@ -43,12 +47,45 @@ public class ExpandableListFragment extends TabFragment {
     private int[] removeInfo = new int[2]; //index 0 is groupPosition, index 1 is childPosition 
     private boolean[] removeWhich = new boolean[2]; //index 0 is for (removeProjects?), index 1 is for (removeRecordings?)
     public Map<View, Integer> viewTable = new HashMap<View, Integer>(); //A hash table which maps hashCodes to a unique ID.
-	
+	String tab;
+//    public ExpandableListFragment(ArrayList<String> headers, HashMap<String, List<String>> listData) {
+//        // Required empty public constructor
+//		listDataHeader = headers;
+//        listDataChild = listData;
+//    }
+    
+    public static ExpandableListFragment newInstance(int someInt, String someTitle) {
+        ExpandableListFragment explf = new ExpandableListFragment();
+        Bundle args = new Bundle();
+        args.putInt("someInt", someInt);
+        args.putString("someTitle", someTitle);
+        explf.setArguments(args);
+        return explf;
+    }
+    
+    public ExpandableListFragment(){
+    	
+    }
+    
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        //setContentView(R.layout.main);
+        //setUpView();
+        int SomeInt = getArguments().getInt("someInt", 0);   
+        String someTitle = getArguments().getString("someTitle", "");
+        tab = someTitle;
+        Log.d("WORKED: ", someTitle + " " + SomeInt);
+    }
 	@Override
 	void setUpView() {
 		expListView = (ExpandableListView) currentTabView.findViewById(R.id.lvExp);
 		prepareList();
-		listAdapter = new ExpandableListAdapter(this, context, listDataHeader, listDataChild);
+		boolean shared = false;
+		if (tab.equals("shared")){
+			shared = true;
+		}
+		listAdapter = new ExpandableListAdapter(this, context, listDataHeader, listDataChild, shared);
 		expListView.setAdapter(listAdapter);
 		setUp();
 	}
@@ -57,7 +94,11 @@ public class ExpandableListFragment extends TabFragment {
 	void setUp() {
 		addButton = (Button) currentTabView.findViewById(R.id.addProject);
 		delButton = (Button) currentTabView.findViewById(R.id.removeParent);
-
+		LinearLayout bottom_bar = (LinearLayout) currentTabView.findViewById(R.id.bottom_bar);
+		if (tab.equals("shared")){
+			bottom_bar.setVisibility(View.GONE);
+			((FrameLayout) currentTabView.findViewById(R.id.list_bot_shadow)).setVisibility(View.GONE); //Bottom bar shadow
+		}
 		OnClickListener buttonListener = new OnClickListener() {
 			
 			@Override
@@ -69,8 +110,6 @@ public class ExpandableListFragment extends TabFragment {
 				case R.id.removeParent:
 					startRemove();
 					break;
-				case R.id.addRec:
-					//add(v, "child", groupPosition);
 				}
 			}
 		};
@@ -125,6 +164,33 @@ public class ExpandableListFragment extends TabFragment {
 	            		alert.show();
 	            	} else {
 	            			Intent i = new Intent(context, Info.class);
+	            			// fake data here
+	            			File mFile = new File(getActivity().getFilesDir(), "audiotest.3gp");
+	            			String filePath = mFile.getAbsolutePath();
+	            			Bundle data = new Bundle();
+	            			i.putExtra("recordPath", filePath);
+	            			data.putBoolean("is_timer", true);
+	            			data.putBoolean("over_time", true);
+	            			HashMap<String, Integer> goodWordCounts = new HashMap<String, Integer>();
+	            			goodWordCounts.put("crowdsourced", 5);
+	            			goodWordCounts.put("user-generated content", 3);
+	            			
+	            			HashMap<String, Integer> badWordCounts = new HashMap<String, Integer>();
+	            			badWordCounts.put("um", 9);
+	            			badWordCounts.put("like", 4);
+	            			
+	            			HashMap<String, Integer> allWordCounts = new HashMap<String, Integer>();
+	            			allWordCounts.putAll(goodWordCounts);
+	            			allWordCounts.putAll(badWordCounts);	            			
+	            			
+	            			data.putSerializable("good", goodWordCounts);
+	            			data.putSerializable("bad", badWordCounts);
+	            			data.putSerializable("all", allWordCounts);
+	            			data.putSerializable("wpm", 120);
+	            			data.putInt("cur_time", 310);
+	            			data.putInt("time_limit", 300);
+	            			
+	            			i.putExtras(data);
 	            			startActivity(i);
 	            	}
 	                return false;
@@ -207,10 +273,10 @@ public class ExpandableListFragment extends TabFragment {
 		}
 		listAdapter.notifyDataSetChanged();
 		listAdapter.notifyDataSetInvalidated();
-			if (!isGroup) {
-				Intent i = new Intent(context, RecorderActivity.class);
-				startActivity(i);
-			}
+		if (!isGroup) {
+			Intent i = new Intent(context, RecorderActivity.class);
+			startActivity(i);
+		}
 	}
 	
 	private void startRemove() {
@@ -359,6 +425,17 @@ public class ExpandableListFragment extends TabFragment {
 		
 	@Override
 	void prepareList() {
+		if (tab.equals("recordings")){
+			recordingsView();
+		} else if(tab.equals("shared")){
+			sharedwithMeView();
+		}
+		else {
+			//
+		}
+	}
+	
+	public void recordingsView(){
 		listDataHeader = new ArrayList<String>();
         listDataChild = new HashMap<String, List<String>>();
         
@@ -368,6 +445,70 @@ public class ExpandableListFragment extends TabFragment {
         listDataHeader.add("Microsoft");
         listDataHeader.add("Qualcomm");
         listDataHeader.add("VC");
+	
+        //Adding recordings/children
+        // Adding child data
+        List<String>  one = new ArrayList<String>();
+        one.add("Rec 1 - 04/01/14");
+        one.add("Rec 2 - 04/01/14");
+        one.add("Rec 3 - 04/02/14");
+        one.add("Rec 4 - 04/02/14");
+        one.add("Rec 5 - 04/02/14");
+        one.add("Rec 6 - 04/03/14");
+        one.add("Rec 7 - 04/07/14");
+        
+        List<String>  two = new ArrayList<String>();
+        two.add("Rec 1 - 04/01/14");
+        two.add("Rec 2 - 04/01/14");
+        two.add("Rec 3 - 04/02/14");
+        two.add("Rec 4 - 04/02/14");
+        two.add("Rec 5 - 04/02/14");
+        two.add("Rec 6 - 04/03/14");
+        two.add("Rec 7 - 04/07/14");
+        
+        List<String>  three = new ArrayList<String>();
+        three.add("Rec 1 - 04/01/14");
+        three.add("Rec 2 - 04/01/14");
+        three.add("Rec 3 - 04/02/14");
+        three.add("Rec 4 - 04/02/14");
+        three.add("Rec 5 - 04/02/14");
+        three.add("Rec 6 - 04/03/14");
+        three.add("Rec 7 - 04/07/14");
+        
+        List<String>  four = new ArrayList<String>();
+        four.add("Rec 1 - 04/01/14");
+        four.add("Rec 2 - 04/01/14");
+        four.add("Rec 3 - 04/02/14");
+        four.add("Rec 4 - 04/02/14");
+        four.add("Rec 5 - 04/02/14");
+        four.add("Rec 6 - 04/03/14");
+        four.add("Rec 7 - 04/07/14");
+	
+        List<String>  five = new ArrayList<String>();
+        five.add("Rec 1 - 04/01/14");
+        five.add("Rec 2 - 04/01/14");
+        five.add("Rec 3 - 04/02/14");
+        five.add("Rec 4 - 04/02/14");
+        five.add("Rec 5 - 04/02/14");
+        five.add("Rec 6 - 04/03/14");
+        five.add("Rec 7 - 04/07/14");
+	
+        listDataChild.put(listDataHeader.get(0), one);
+        listDataChild.put(listDataHeader.get(1), two);
+        listDataChild.put(listDataHeader.get(2), three);
+        listDataChild.put(listDataHeader.get(3), four);
+        listDataChild.put(listDataHeader.get(4), five);
+	}
+	public void sharedwithMeView(){
+		listDataHeader = new ArrayList<String>();
+        listDataChild = new HashMap<String, List<String>>();
+        
+        // Adding projects/headers
+        listDataHeader.add("Bob H.'s recordings");
+        listDataHeader.add("Angel's recordings");
+        listDataHeader.add("King Henry's recordings");
+        listDataHeader.add("Mr. Clean's recordings");
+        listDataHeader.add("Zoo's recordings");
 	
         //Adding recordings/children
         // Adding child data

@@ -28,14 +28,15 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
     private boolean childRemoveOn = false;
     private boolean parentRemoveOn = false;
     private boolean changedLayout = false;
-
+    private boolean shared;
  
     public ExpandableListAdapter(ExpandableListFragment list, Context context, List<String> listDataHeader,
-            HashMap<String, List<String>> listChildData) {
+            HashMap<String, List<String>> listChildData, boolean sharedV) {
         this._context = context;
         this._listDataHeader = listDataHeader;
         this._listDataChild = listChildData;
         this.myList = list;
+        this.shared = sharedV;
     }
     
     public void setRemoveChild(boolean remove) {
@@ -127,6 +128,9 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
         }
     	ImageButton removeProj = (ImageButton) convertView.findViewById(R.id.removeProject);
     	ImageButton addRec = (ImageButton) convertView.findViewById(R.id.addRec);
+    	if(shared){
+    		addRec.setVisibility(View.GONE);
+    	}
         if (parentRemoveOn && removeProj != null && !(removeProj.callOnClick())) {
         	removeProj.setFocusable(false);
         	removeProj.setOnClickListener(new OnClickListener() {

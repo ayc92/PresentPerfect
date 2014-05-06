@@ -12,18 +12,24 @@
     <string name="hello_world">Hello world!</string>
     <string name="create">Create!</string>
     <string name="cancel">Cancel</string>
+    <string name="instr">Press the microphone to begin recording!</string>
     <string name="title_activity_splash">SplashActivity</string>
     <string name="delete">Delete</string>
+    <string name="action_share">Share</string>
+
     <string-array name="removeOptions">
         <item>Projects</item>
         <item>Recordings</item>
     </string-array>
 
-   <string name="default_word">All</string>
- 
+    <string name="default_word">All</string>
+
     <string-array name="word_choices">
         <item>All</item>
         <item>Avoid</item>
         <item>Incorporate</item>
     </string-array>
+
+    <string name="title_activity_tab_list">TabList</string>
+
 </resources>

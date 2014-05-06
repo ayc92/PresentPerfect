@@ -6,10 +6,13 @@
 	android:id="@+id/p_layout"
 	android:background="#cfcece"
     tools:context=".Info" >
+<ScrollView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content">
 <LinearLayout
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     android:layout_marginLeft="20dp"
     android:layout_marginRight="20dp"
     android:layout_gravity="center_horizontal">
@@ -18,28 +21,34 @@
     android:orientation="horizontal"
     android:layout_width="match_parent"
     android:layout_marginTop="20dp"
+    android:paddingTop="20dp"
+    android:paddingBottom="20dp"
+    android:background="#04476d"
     android:gravity="center_horizontal"
     android:layout_height="wrap_content">
      <ImageView
         android:id="@+id/skipback"
-        android:layout_width="45dp"
-        android:layout_height="45dp"
-        android:layout_marginRight="25dp"
-        android:layout_gravity="center_horizontal|center_vertical"
+        android:layout_width="35dp"
+        android:layout_height="35dp"
+        android:layout_marginRight="45dp"
+        android:layout_gravity="center_vertical"
+        android:background="@android:color/transparent"
         android:src="@drawable/skipb" />
-    <ImageButton
+    <ImageView
         android:id="@+id/playrec"
-        android:layout_width="85dp"
-        android:layout_height="85dp"
-        android:layout_gravity="center_horizontal"
+        android:layout_width="35dp"
+        android:layout_height="35dp"
+        android:layout_gravity="center_vertical"
+        android:background="@android:color/transparent"
         android:onClick="playback"
-        android:src="@drawable/playlightblue" />
+        android:src="@drawable/playb" />
         <ImageView
         android:id="@+id/skipforward"
-        android:layout_width="45dp"
-        android:layout_height="45dp"
-        android:layout_marginLeft="25dp"
+        android:layout_width="35dp"
+        android:layout_height="35dp"
+        android:layout_marginLeft="45dp"
         android:layout_gravity="center_horizontal|center_vertical"
+        android:background="@android:color/transparent"
         android:src="@drawable/skipf" />
     </LinearLayout>
 <TextView
@@ -48,7 +57,7 @@
         android:layout_height="wrap_content"
         android:textSize="25sp"
         android:background="#52B848"
-        android:layout_marginTop="40dp"
+        android:layout_marginTop="30dp"
 		android:paddingTop="20dp"
         android:paddingBottom="20dp"
         android:paddingLeft="20dp"
@@ -76,10 +85,10 @@
     android:orientation="horizontal"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="#ffffff"
+    android:background="@drawable/recorder_bg"
     android:clickable="true"
     android:onClick="toggle_contents"
-    android:layout_marginTop="50dp">
+    android:layout_marginTop="30dp">
 
 <TextView
     android:id="@+id/wordcounts"
@@ -88,7 +97,7 @@
         android:layout_weight="1"
         android:layout_height="wrap_content"
         android:textSize="30sp"
-        android:background="#ffffff"
+        android:background="@drawable/recorder_bg"
         android:textColor="#2b7cc0"
         android:paddingTop="20dp"
         android:paddingBottom="20dp"
@@ -116,13 +125,12 @@
         android:layout_gravity="center_horizontal"
         android:gravity="center_horizontal"
         android:prompt="@string/default_word" />
-		<ListView
-    	android:id="@+id/listcount"
-    	android:layout_width="wrap_content" 
-    	android:layout_height="wrap_content"
-    	android:drawSelectorOnTop="false"
-    	android:background="#ffffff"
-    />
+		<LinearLayout
+    android:id="@+id/countList"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+    </LinearLayout>
 	</LinearLayout>
 	<LinearLayout
     	android:orientation="horizontal"
@@ -131,7 +139,7 @@
     	android:clickable="true"
     	android:onClick="toggle_contents2"
     	android:layout_marginTop="30dp"
-    	android:background="#ffffff"
+    	android:background="@drawable/recorder_bg"
     	android:layout_gravity="center_horizontal">
 		<TextView
     	android:id="@+id/comments"
@@ -140,7 +148,7 @@
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:textSize="30sp"
-        android:background="#ffffff"
+        android:background="@drawable/recorder_bg"
         android:textColor="#2b7cc0"
         android:paddingTop="20dp"
         android:paddingBottom="20dp"
@@ -154,14 +162,13 @@
         android:layout_gravity="center_vertical|right"
         android:src="@drawable/arrowdownblue" />
 		</LinearLayout>
-		<ListView
-    	android:id="@+id/commentlist"
-    	android:layout_width="wrap_content" 
-    	android:layout_height="wrap_content"
-    	android:drawSelectorOnTop="false"
-    	android:visibility="gone"
-    	android:background="#ffffff"
-    />
+		<LinearLayout
+    android:id="@+id/commentlist"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:visibility="gone"
+    android:layout_height="wrap_content">
+    </LinearLayout>
 		<LinearLayout
     	android:orientation="horizontal"
     	android:layout_width="match_parent"
@@ -169,7 +176,7 @@
     	android:clickable="true"
     	android:onClick="toggle_contents3"
     	android:layout_marginTop="30dp"
-    	android:background="#ffffff"
+    	android:background="@drawable/recorder_bg"
     	android:layout_gravity="center_horizontal">
 		<TextView
     	android:id="@+id/notes"
@@ -178,7 +185,7 @@
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:textSize="30sp"
-        android:background="#ffffff"
+        android:background="@drawable/recorder_bg"
         android:textColor="#2b7cc0"
         android:paddingTop="20dp"
         android:paddingBottom="20dp"
@@ -210,6 +217,7 @@
     	android:hint="Type notes here"
     />
 			</LinearLayout>
+		<!--
 			     <ImageView
         android:id="@+id/skipback"
         android:layout_width="wrap_content"
@@ -219,5 +227,7 @@
         android:clickable="true"
     	android:onClick="shareAction"
         android:src="@drawable/shareblue" />
+        -->
 </LinearLayout>
+</ScrollView>
 </LinearLayout>

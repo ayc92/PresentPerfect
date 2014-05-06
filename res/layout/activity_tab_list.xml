@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    android:background="@color/background"
+    tools:context=".TabList" >
+
+   		<ListView
+        android:id="@+id/list"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent" />
+    	<LinearLayout
+    	    android:id="@+id/bottom_bar"
+    	    android:layout_width="fill_parent"
+    	    android:layout_height="wrap_content"
+    	    android:background="@drawable/border"
+    	    android:orientation="horizontal"
+    	    android:layout_alignParentBottom="true"
+    	    android:divider="@drawable/custom_divider"
+    	    android:showDividers="middle"
+    	    android:dividerPadding="2dp">
+    
+    
+    	    <Button
+    	        android:id="@+id/addProject" 
+    	        android:layout_height="fill_parent"
+    	        android:layout_width="0dp"
+    	        android:layout_weight="1"
+    	        android:text="Add"
+    	        android:gravity="center"
+    	        android:textColor="@color/background"
+    	        android:background="@color/mod_black"/>
+    	    
+    	    <Button
+    	        android:id="@+id/removeParent" 
+    	        android:layout_height="fill_parent"
+    	        android:layout_width="0dp"
+    	        android:layout_weight="1"
+    	        android:text="Remove"
+    	        android:gravity="center"
+    	        android:textColor="@color/background"
+    	        android:background="@color/mod_black"/>
+    	</LinearLayout>
+   		
+                
+</RelativeLayout>
