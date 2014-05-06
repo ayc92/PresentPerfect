@@ -47,6 +47,7 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 
 public class OptionsActivity extends MotherBrain {
+	String recName;
 	int min;
 	EditText timeChosen;
 	ImageButton buzzwords;
@@ -72,11 +73,12 @@ public class OptionsActivity extends MotherBrain {
 		setContentView(R.layout.activity_options);
 		
 		// format action bar
-		formatActionBar("Options");
+		formatActionBar("Recording Options");
 		
 		buzzList = (LinearLayout) findViewById(R.id.buzzList);
 		Intent intent = getIntent();
 		params = intent.getExtras();
+		recName = params.getString("rec_name");
 		main = this;
 		min = params.getInt("min");
 		timer = params.getBoolean("timer");
@@ -115,15 +117,12 @@ public class OptionsActivity extends MotherBrain {
 	@Override
 	public void onBackPressed() {
 		Intent recordIntent = new Intent(this, RecorderActivity.class);
+		recordIntent.putExtra("rec_name", recName);
 		recordIntent.putStringArrayListExtra("all_items", all_items);
 		recordIntent.putStringArrayListExtra("good_items", good_items);
 		recordIntent.putStringArrayListExtra("bad_items", bad_items);
-		// ArrayList<String> bad_items = myIntent.getStringArrayListExtra("bad_items");
 		recordIntent.putExtra("timer", timer);
-		// boolean timer = getIntent().getExtras().getBoolean("timer");
 		recordIntent.putExtra("min", min);
-		startActivity(recordIntent);
-		// int min = mIntent.getIntExtra("min", 0);
 		startActivity(recordIntent);
 	}
 	
