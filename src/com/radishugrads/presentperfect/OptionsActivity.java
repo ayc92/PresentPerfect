@@ -126,12 +126,14 @@ public class OptionsActivity extends MotherBrain {
 	@Override
 	public void onBackPressed() {
 		Intent recordIntent = new Intent(this, RecorderActivity.class);
-		recordIntent.putExtra("rec_name", recName);
-		recordIntent.putStringArrayListExtra("all_items", all_items);
-		recordIntent.putStringArrayListExtra("good_items", good_items);
-		recordIntent.putStringArrayListExtra("bad_items", bad_items);
-		recordIntent.putExtra("timer", timer);
-		recordIntent.putExtra("min", min);
+		Bundle data = new Bundle();
+		data.putString("rec_name", recName);
+		data.putStringArrayList("all_items", all_items);
+		data.putStringArrayList("good_items", good_items);
+		data.putStringArrayList("bad_items", bad_items);
+		data.putBoolean("timer", timer);
+		data.putInt("min", min);
+		recordIntent.putExtras(data);
 		startActivity(recordIntent);
 	}
 	
