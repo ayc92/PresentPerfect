@@ -40,7 +40,6 @@
         android:layout_height="35dp"
         android:layout_gravity="center_vertical"
         android:background="@android:color/transparent"
-        android:onClick="playback"
         android:src="@drawable/playb" />
         <ImageView
         android:id="@+id/skipforward"

@@ -370,8 +370,7 @@ public class SpinnerActivity1 extends Activity implements OnItemSelectedListener
 			alertDialog.show();
 	}
 
-	public void playback(View v) {
-		//Change play button to pause here
+	public void playback() {
 		mPlayer = new MediaPlayer();
         try {
 			File mFile = new File(filePath);
@@ -426,10 +425,17 @@ public class SpinnerActivity1 extends Activity implements OnItemSelectedListener
 			switch (currentImage) {
 				case R.drawable.playb_pressed:
 					System.out.println("Changing to pause");
+					if (mPlayer == null) {
+						playback();
+					} else {
+						mPlayer.start();
+					}
 					mediaButton.setImageResource(R.drawable.pauseb);
 					break;
 				case R.drawable.pauseb_pressed:
-					System.out.println("Changing to play");
+					if (mPlayer != null && mPlayer.isPlaying()) {
+						mPlayer.stop();
+					}
 					mediaButton.setImageResource(R.drawable.playb);
 					break;
 					
