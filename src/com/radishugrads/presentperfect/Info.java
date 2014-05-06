@@ -481,7 +481,6 @@ public class SpinnerActivity1 extends Activity implements OnItemSelectedListener
 		public void run() {
 			switch (currentImage) {
 				case R.drawable.playb_pressed:
-					System.out.println("changing to pause");
 					mediaButton.setImageResource(R.drawable.pauseb);
 					if (mPlayer == null) {
 						playback();
@@ -490,7 +489,6 @@ public class SpinnerActivity1 extends Activity implements OnItemSelectedListener
 					}
 					break;
 				case R.drawable.pauseb_pressed:
-					System.out.println("changing to play");
 					mediaButton.setImageResource(R.drawable.playb);
 					if (mPlayer != null && mPlayer.isPlaying()) {
 						mPlayer.stop();
@@ -516,7 +514,6 @@ public class SpinnerActivity1 extends Activity implements OnItemSelectedListener
 		@Override
 		public boolean onTouch(View v, MotionEvent event) {
 			if (event.getAction() == android.view.MotionEvent.ACTION_DOWN) {
-				System.out.println("ACTION DOWN");
 				if (isPlaying) { //Pause Button Showing
 					changeImage(downEndResource);
 					mPlayer.stop();
@@ -545,9 +542,7 @@ public class SpinnerActivity1 extends Activity implements OnItemSelectedListener
 				
 			}
 			else {
-				System.out.println("ACTION UP");
 				if (changeImage) {
-					System.out.println("finish push = change image is true");
 					myHandler.postDelayed(finishPush, 200);
 					changeImage = false;
 					isPlaying = !isPlaying;
