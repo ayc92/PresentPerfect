@@ -22,6 +22,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -233,11 +234,12 @@ public class RecorderActivity extends MotherBrain {
 	
 	// remove callbacks and create new intent
 	private void sendFeedbackIntent() {
+		Log.d("asdf", "Sending feedback intent!");
 		handler.removeCallbacks(updateTime);
 		handler.removeCallbacks(flashMic);
 
 		Intent recordIntent = new Intent(context, Info.class);
-		recordIntent.putExtra("recordPath", filePath);
+		recordIntent.putExtra("recordPath", filePath + ".flac");
 		Bundle data = new Bundle();
 		data.putBoolean("is_timer", isTimer);
 		if (!isTimer) {
@@ -414,6 +416,7 @@ public class RecorderActivity extends MotherBrain {
 		
 		FLAC_FileEncoder ffe = new FLAC_FileEncoder();
 		ffe.encode(in, out);
+		Log.d("asdf", "Done converting to flac!");
 	}
 	
 	// runnable for updating time

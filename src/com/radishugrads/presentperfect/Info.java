@@ -14,6 +14,8 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -30,7 +32,7 @@ import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-public class Info extends MotherBrain {
+public class Info extends MotherBrain implements Handler.Callback {
 	int actual_min;
 	int actual_sec;
 	int target_min;
@@ -69,6 +71,7 @@ public class Info extends MotherBrain {
 	
 	private MediaPlayer mPlayer = null;
 	String filePath = null;
+	Handler handler = new Handler(this);
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -130,7 +133,9 @@ public class Info extends MotherBrain {
 		spinner1 = (Spinner) findViewById(R.id.spinner1);
 		spinner1.setOnItemSelectedListener(new SpinnerActivity1());
 		updateList_comments();
-		filePath = getFilesDir() + "/audiotest.3gp";
+		filePath = getIntent().getStringExtra("recordPath");
+		
+		speechToText();
 	}
 
 	@Override
@@ -398,6 +403,32 @@ public class SpinnerActivity1 extends Activity implements OnItemSelectedListener
 		    comment_view.addView(view);
 		}
 		  
+	}
+	
+	private void speechToText() {
+		Recognition r = new Recognition(handler, filePath);
+		new Thread(r, "Speech2Text thread").start();
+	}
+	
+	public boolean handleMessage(Message msg) {
+		String transcription = (String) msg.obj;
+		Log.d("asdf", "Transcription: " + transcription);
+		HashMap<String, Integer> hm = new HashMap<String, Integer>();
+		String[] wordArray = transcription.split(" ");
+		for(String word : wordArray) {
+			for(int i = 0; i < words.size(); i++) {
+				if( word.toLowerCase().equals(words.get(i).toLowerCase()) ) {
+					if(hm.get(word) == null)
+						hm.put(word, 1);
+					else
+						hm.put(word, hm.get(word) + 1);
+				}
+			}
+		}
+		words = new ArrayList<String>(hm.keySet());
+		counts = new ArrayList<Integer>(hm.values());
+		updateList();
+		return true;
 	}
 
 }
