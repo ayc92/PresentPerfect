@@ -47,7 +47,7 @@ public class Info extends MotherBrain {
 	boolean wordVisib;
 	boolean commentVisib;
 	boolean notesVisib;
-	boolean isPlaying;
+	boolean isPlaying = false;
 	boolean changeImage = false;
 	Handler myHandler;
 	ImageView arrow1;
@@ -433,6 +433,7 @@ public class SpinnerActivity1 extends Activity implements OnItemSelectedListener
 					
 			}
 		}
+		
 	};
 	
 	private void changeImage(int ID) {
@@ -449,24 +450,19 @@ public class SpinnerActivity1 extends Activity implements OnItemSelectedListener
 		@Override
 		public boolean onTouch(View v, MotionEvent event) {
 			if (event.getAction() == android.view.MotionEvent.ACTION_DOWN) {
-				System.out.println("Action DOWN");
 				if (isPlaying) { //Pause Button Showing
-					System.out.println("isPlaying is true");
 					changeImage(downEndResource);
 				} else { //Play Button Showing
-					System.out.println("isPlaying is false");
 					changeImage(downStartResource);
 				}
 				changeImage = true;
 			}
 			else {
-				System.out.println("Action UP");
 				if (changeImage) {
-				myHandler.postDelayed(finishPush, 200);
+					myHandler.postDelayed(finishPush, 200);
+					changeImage = false;
+					isPlaying = !isPlaying;
 				}
-				changeImage = false;
-				
-				isPlaying = !isPlaying;
 			} 
 			return false;
 		}
