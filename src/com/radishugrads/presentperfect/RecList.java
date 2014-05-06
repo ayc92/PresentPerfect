@@ -7,7 +7,6 @@ import android.app.ActionBar;
 import android.app.ActionBar.Tab;
 import android.app.ActionBar.TabListener;
 import android.app.FragmentTransaction;
-import android.app.ListActivity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
@@ -48,9 +47,14 @@ public class RecList extends MotherBrain implements TabListener {
         
         // Adding Tabs
         for (String tab_name : tabs) {
+        	boolean isSelected = false;
+        	if (tab_name.equals("My Pitches")) {
+        		isSelected = true;
+        	}
             actionBar.addTab(actionBar.newTab().setText(tab_name)
-                    .setTabListener(this));
+                    .setTabListener(this), isSelected);
         }
+        
         
         /**
          * on swiping the viewpager make respective tab selected
