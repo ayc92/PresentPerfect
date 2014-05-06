@@ -45,7 +45,6 @@ public class TabList extends Fragment {
         //setUpView(); 
         String someTitle = getArguments().getString("someTitle", "");
         tab = someTitle;
-        Log.d("WORKED: ", someTitle);
         notifications = new ArrayList<String>();
         contacts = new ArrayList<String>();
         notifications.add("Bob shared a recording with you");
@@ -83,7 +82,6 @@ public class TabList extends Fragment {
         	addb.setOnClickListener(new OnClickListener(){
 		        @Override
 		        public void onClick(View v) {
-		        	Log.d("CLICKED ADD", "YA");
 		        	createChooseNameDialog();
 		        	
 		        }
@@ -92,10 +90,8 @@ public class TabList extends Fragment {
         	deleteb.setOnClickListener(new OnClickListener(){
 		        @Override
 		        public void onClick(View v) {
-		        	Log.d("CLICKED REM", "YA");
 		        	deleteMode = !deleteMode;
 		        	adapter.notifyDataSetChanged();
-		        	
 		        }
         	});
         }
@@ -138,11 +134,8 @@ public class TabList extends Fragment {
 		@Override
 		public View getView(final int position, View convertView, ViewGroup parent) {
 		    View view;
-		    Log.d("OOOO", "INNNNN");
-		        LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE); 
-		        view = inflater.inflate(R.layout.tab_list, null);
-		        Log.d("OOOO", "INNNN222");
-		    Log.d("OOOO", "IN 33333");
+	        LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE); 
+	        view = inflater.inflate(R.layout.tab_list, null);
 		    //Handle buttons and add onClickListeners
 		    ImageButton deleteBtn = (ImageButton) view.findViewById(R.id.delete);
 		    if(deleteMode){

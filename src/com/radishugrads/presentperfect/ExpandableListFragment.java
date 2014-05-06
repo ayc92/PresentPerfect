@@ -13,7 +13,6 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.WindowManager.LayoutParams;
@@ -25,6 +24,7 @@ import android.widget.ExpandableListView.OnGroupCollapseListener;
 import android.widget.ExpandableListView.OnGroupExpandListener;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 
@@ -190,6 +190,7 @@ public class ExpandableListFragment extends TabFragment {
 	            			data.putSerializable("wpm", 120);
 	            			data.putInt("cur_time", 310);
 	            			data.putInt("time_limit", 300);
+	            			data.putString("rec_name", ((TextView) v.findViewById(R.id.lblListItem)).getText().toString());
 	            			
 	            			i.putExtras(data);
 	            			startActivity(i);
@@ -276,6 +277,9 @@ public class ExpandableListFragment extends TabFragment {
 		listAdapter.notifyDataSetInvalidated();
 		if (!isGroup) {
 			Intent i = new Intent(context, RecorderActivity.class);
+			Bundle data = new Bundle();
+			data.putString("rec_name", name);
+			i.putExtras(data);
 			startActivity(i);
 		}
 	}

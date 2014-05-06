@@ -6,6 +6,7 @@ import java.util.HashMap;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.media.AudioFormat;
 import android.media.AudioManager;
 import android.media.AudioRecord;
@@ -54,6 +55,9 @@ public class RecorderActivity extends MotherBrain {
 	Handler micHandler;
 	int currentMic;
 	
+	// recording name
+	String recName;
+	
 	// animation
 	TranslateAnimation slideLeft;
 	TranslateAnimation slideRight;
@@ -91,16 +95,17 @@ public class RecorderActivity extends MotherBrain {
 		
 		context = this;
 		
-		// format action bar
-		formatActionBar("Recorder");
-		
 		// get params
 		goodWordCounts = new HashMap<String, Integer>();
 		badWordCounts = new HashMap<String, Integer>();
 		allWordCounts = new HashMap<String, Integer>();
 		
 		params = getIntent().getExtras();
-		if (params != null) {
+		recName = params.getString("rec_name");
+		// format action bar
+		formatActionBar(recName);
+		// only have the name
+		if (params.size() > 1) {
 			ArrayList<String> good_items = params.getStringArrayList("good_items");
 			ArrayList<String> bad_items = params.getStringArrayList("bad_items");
 			ArrayList<String> all_items = params.getStringArrayList("all_items");
@@ -249,6 +254,8 @@ public class RecorderActivity extends MotherBrain {
 		Intent recordIntent = new Intent(context, Info.class);
 		recordIntent.putExtra("recordPath", filePath);
 		Bundle data = new Bundle();
+		
+		data.putString("rec_name", recName);
 		data.putBoolean("is_timer", isTimer);
 		if (!isTimer) {
 			data.putBoolean("over_time", timeInSecs > timeLimit);

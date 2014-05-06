@@ -75,10 +75,9 @@ public class Info extends MotherBrain {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_info);
 		
-		// format action bar
-		formatActionBar("Feedback");
-		
 		data = getIntent().getExtras();
+		// format action bar
+		formatActionBar("Feedback for " + data.getString("rec_name"));
 		is_timer = data.getBoolean("is_timer");
 		actual_min = data.getInt("cur_time") / 60;
 		actual_sec = data.getInt("cur_time") % 60;
