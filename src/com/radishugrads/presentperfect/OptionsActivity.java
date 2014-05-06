@@ -88,6 +88,9 @@ public class OptionsActivity extends MotherBrain {
 		currList = 0;
 		buzzwords = (ImageButton) findViewById(R.id.wordslist);
 		placeholder = (TextView) findViewById(R.id.placeholdr);
+		if(all_items.size() > 0){
+			placeholder.setVisibility(View.GONE);
+		}
 		include = true;
 		adapter = new buzzlistAdapter(items, this);
 
