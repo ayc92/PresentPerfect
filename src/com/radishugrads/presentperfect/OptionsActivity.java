@@ -158,7 +158,6 @@ public class OptionsActivity extends MotherBrain {
 								//MainActivity.this.finish();
 								final EditText addedWord = (EditText) v.findViewById(R.id.newWord);
 								String word = addedWord.getText().toString().toLowerCase();
-								Log.d("OOOO", "PREADD");
 								if (all_items.contains(word)){
 									Toast.makeText(getApplicationContext(), "You already added this word!", Toast.LENGTH_SHORT).show();
 									return;
@@ -166,16 +165,13 @@ public class OptionsActivity extends MotherBrain {
 								all_items.add(word);
 								if (currList == 0){
 									items.add(word);
-									Log.d("OOOO", "ADDED TO ITEMS");
 								}
 								final RadioGroup g = (RadioGroup) v.findViewById(R.id.wordType);
 								int selected = g.getCheckedRadioButtonId();
 								if (selected == R.id.incorp){
-									Log.d("OOOO", "WEEE");
 									include = true;
 								} else {
 									include = false;
-									Log.d("OOOO", "COOOLLL");
 								}
 								if(include){
 									good_items.add(word);
@@ -272,11 +268,8 @@ public class OptionsActivity extends MotherBrain {
 		@Override
 		public View getView(final int position, View convertView, ViewGroup parent) {
 		    View view;
-		    Log.d("OOOO", "INNNNN");
-		        LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE); 
-		        view = inflater.inflate(R.layout.buzzlist, null);
-		        Log.d("OOOO", "INNNN222");
-		    Log.d("OOOO", "IN 33333");
+	        LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE); 
+	        view = inflater.inflate(R.layout.buzzlist, null);		    
 		    //Handle buttons and add onClickListeners
 		    ImageButton deleteBtn = (ImageButton) view.findViewById(R.id.delete_btn);
 		    if(deleteMode){
