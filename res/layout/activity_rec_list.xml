@@ -31,7 +31,7 @@
     </FrameLayout>
   		
    	<LinearLayout
-   	    android:id="@id/bottom_bar"
+   	    android:id="@+id/bottom_bar"
    	    android:layout_width="fill_parent"
    	    android:layout_height="wrap_content"
    	    android:background="@drawable/border"
@@ -51,11 +51,6 @@
    	        android:paddingBottom="10dp"
    	        android:textColor="@color/background"
    	        android:background="@color/mod_black"/>
-   	    
-   	    <View
-		    android:layout_width="0dp"
-		    android:layout_height="match_parent"
-		    android:background="@color/background" />
    	    
    	    <Button
    	        android:id="@+id/removeParent" 

@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 
 import android.app.Activity;
@@ -14,10 +15,14 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.os.Bundle;
+import android.os.Environment;
+import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -30,7 +35,7 @@ import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-public class Info extends MotherBrain {
+public class Info extends MotherBrain implements Handler.Callback {
 	int actual_min;
 	int actual_sec;
 	int target_min;
@@ -45,9 +50,14 @@ public class Info extends MotherBrain {
 	boolean wordVisib;
 	boolean commentVisib;
 	boolean notesVisib;
+	boolean isPlaying = false;
+	boolean changeImage = false;
+	Handler myHandler;
 	ImageView arrow1;
 	ImageView arrow2;
 	ImageView arrow3;
+	ImageView mediaButton;
+	int currentImage;
 	ArrayList<String> words;
 	ArrayList<Integer> counts;
 	ArrayList<String> chosen_contacts;
@@ -69,12 +79,14 @@ public class Info extends MotherBrain {
 	
 	private MediaPlayer mPlayer = null;
 	String filePath = null;
+	Handler handler = new Handler(this);
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_info);
 		
+		myHandler = new Handler();
 		data = getIntent().getExtras();
 		// format action bar
 		formatActionBar("Feedback for " + data.getString("rec_name"));
@@ -100,6 +112,8 @@ public class Info extends MotherBrain {
 		counts.addAll(all_counts);
 		updateList();
 		
+		mediaButton = (ImageView) findViewById(R.id.playrec);
+
 		time_f = (TextView) findViewById(R.id.speechtime);
 		speed_f = (TextView) findViewById(R.id.wordspermin);
 		if (over_time){
@@ -113,7 +127,7 @@ public class Info extends MotherBrain {
 		if (!over_time) {
 			time_f.setText(String.format("Speech time: %1$02d:%2$02d", actual_min, actual_sec));
 		}
-		if (wpm > 150 || wpm < 130){
+		if (wpm > 150 || wpm < 90){
 			speed_f.setBackgroundColor(Color.parseColor("#D22027"));
 		}
 		speed_f.setText("Speed: " + wpm + " wpm");
@@ -131,8 +145,13 @@ public class Info extends MotherBrain {
 		spinner1 = (Spinner) findViewById(R.id.spinner1);
 		spinner1.setOnItemSelectedListener(new SpinnerActivity1());
 		updateList_comments();
-		filePath = getFilesDir() + "/audiotest.3gp";
-		
+		File dir = new File(Environment.getExternalStorageDirectory().getPath(), "PresentPerfect");
+		filePath = dir + "/" + getIntent().getStringExtra("rec_name") + ".wav";
+		speechToText();
+		mediaButton.setOnTouchListener(new playbackButtonOnTouchListener(R.drawable.playb,  
+				R.drawable.playb_pressed, 
+				R.drawable.pauseb,
+				R.drawable.pauseb_pressed));
 	}
 
 	@Override
@@ -351,8 +370,7 @@ public class SpinnerActivity1 extends Activity implements OnItemSelectedListener
 			alertDialog.show();
 	}
 
-	public void playback(View v) {
-		//Change play button to pause here
+	public void playback() {
 		mPlayer = new MediaPlayer();
         try {
 			File mFile = new File(filePath);
@@ -367,17 +385,18 @@ public class SpinnerActivity1 extends Activity implements OnItemSelectedListener
 	}
 	
 	public void updateList(){
+		Log.d("asdf", "starting updateList()");
 		LinearLayout countList = (LinearLayout) findViewById(R.id.countList);
 		countList.removeAllViews();
 		LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		for (int i = 0; i < counts.size(); i++){
 			View view;
-		    Log.d("OOOO", "INNNNN"); 
+//		    Log.d("OOOO", "INNNNN"); 
 		    view = inflater.inflate(R.layout.wordcountlist, null);
-		    Log.d("OOOO", "INNNN222");
+//		    Log.d("OOOO", "INNNN222");
 		    TextView listNum = (TextView)view.findViewById(R.id.numbercount); 
 		    listNum.setText("" + counts.get(i));
-		    Log.d("OOOO", "IN 33333");
+//		    Log.d("OOOO", "IN 33333");
 		    TextView listWord = (TextView)view.findViewById(R.id.wordofnum); 
 		    listWord.setText(words.get(i));
 		    countList.addView(view);
@@ -389,17 +408,123 @@ public class SpinnerActivity1 extends Activity implements OnItemSelectedListener
 		LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		for (int i = 0; i < comments.length; i++){
 			View view;
-		    Log.d("OOOO", "INNNNN"); 
+//		    Log.d("OOOO", "INNNNN"); 
 		    view = inflater.inflate(R.layout.commentslist, null);
-		    Log.d("OOOO", "INNNN222");
+//		    Log.d("OOOO", "INNNN222");
 		    TextView listUser = (TextView)view.findViewById(R.id.commentuser); 
 		    listUser.setText("Bob says"); 
-		    Log.d("OOOO", "IN 33333");
+//		    Log.d("OOOO", "IN 33333");
 		    TextView listComment = (TextView)view.findViewById(R.id.commenttext); 
 		    listComment.setText(comments[i]);
 		    comment_view.addView(view);
 		}
 		  
+	}
+	
+	private void speechToText() {
+		File f = new File(filePath);
+		if(!f.exists()){
+			Log.d("asdf", "speechToText on nonexistant file");
+			return;
+		}
+		RecognitionV2 r = new RecognitionV2(handler, filePath);
+		new Thread(r, "Speech2Text thread").start();
+	}
+	
+	public boolean handleMessage(Message msg) {
+		String transcription = (String) msg.obj;
+		Log.d("asdf", "Transcription: " + transcription);
+		String[] wordArray = transcription.split(" ");
+		int numWds = wordArray.length;
+		wpm = (int) (numWds / (actual_min + (actual_sec / 60.0)));
+		((TextView) findViewById(R.id.wordspermin)).setText("Speed: "+wpm+" wpm");
+		// buzzword counts
+		int[] goodCount = new int[good_items.size()];
+		int[] badCount = new int[bad_items.size()];
+		for(String word : wordArray) {
+			for(int i = 0; i < good_items.size(); i++) {
+				if( word.toLowerCase().equals(good_items.get(i).toLowerCase()) ) {
+					goodCount[i] ++;
+				}
+			}
+			for(int i = 0; i < bad_items.size(); i++) {
+				if( word.toLowerCase().equals(bad_items.get(i).toLowerCase()) ) {
+					badCount[i] ++;
+				}
+			}
+		}
+		good_counts = new ArrayList<Integer>();
+		for(int c : goodCount) {
+			good_counts.add(c);
+		}
+		bad_counts = new ArrayList<Integer>();
+		for(int c : badCount) {
+			bad_counts.add(c);
+		}
+		all_items = new ArrayList<String>();
+		all_items.addAll(good_items);
+		all_items.addAll(bad_items);
+		all_counts = new ArrayList<Integer>();
+		all_counts.addAll(good_counts);
+		all_counts.addAll(bad_counts);
+		updateList();
+		return true;
+	}
+
+		
+	private Runnable finishPush = new Runnable() {
+		public void run() {
+			switch (currentImage) {
+				case R.drawable.playb_pressed:
+					if (mPlayer == null) {
+						playback();
+					} else {
+						mPlayer.start();
+					}
+					mediaButton.setImageResource(R.drawable.pauseb);
+					break;
+				case R.drawable.pauseb_pressed:
+					if (mPlayer != null && mPlayer.isPlaying()) {
+						mPlayer.stop();
+					}
+					mediaButton.setImageResource(R.drawable.playb);
+					break;
+					
+			}
+		}
+		
+	};
+	
+	private void changeImage(int ID) {
+		mediaButton.setImageResource(ID);
+		currentImage = ID;
+	}
+	
+	private class playbackButtonOnTouchListener extends ButtonOnTouchListener {
+		
+		public playbackButtonOnTouchListener(int s, int ds, int e, int de) {
+			super(s, ds, e, de);
+		}
+		
+		@Override
+		public boolean onTouch(View v, MotionEvent event) {
+			if (event.getAction() == android.view.MotionEvent.ACTION_DOWN) {
+				if (isPlaying) { //Pause Button Showing
+					changeImage(downEndResource);
+				} else { //Play Button Showing
+					changeImage(downStartResource);
+				}
+				changeImage = true;
+			}
+			else {
+				if (changeImage) {
+					myHandler.postDelayed(finishPush, 200);
+					changeImage = false;
+					isPlaying = !isPlaying;
+				}
+			} 
+			return false;
+		}
 	}
 
 }

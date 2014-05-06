@@ -22,8 +22,10 @@ public abstract class TabFragment extends Fragment {
 	Context context;
 	Context appContext;
 	
-	List<String> listDataHeader;
-    HashMap<String, List<String>> listDataChild;
+	static List<String> pitchListDataHeader;
+    static HashMap<String, List<String>> pitchListDataChild;
+    static List<String> sharedListDataHeader;
+    static HashMap<String, List<String>> sharedListDataChild;
 	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,

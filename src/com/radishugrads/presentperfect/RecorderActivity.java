@@ -1,8 +1,14 @@
 package com.radishugrads.presentperfect;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+
+//import com.radishugrads.presentperfect.flacLibrary.FLAC_FileEncoder;
 
 import android.content.Context;
 import android.content.Intent;
@@ -15,7 +21,9 @@ import android.media.MediaPlayer;
 import android.media.MediaRecorder;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -70,17 +78,15 @@ public class RecorderActivity extends MotherBrain {
 	boolean isPaused;
 	
 	// recording variables
-	static final int SAMPLE_RATE = 8000;
-	byte[] buffer;
-	AudioRecord recorder;
-	int bufReadResult;
-	AudioTrack audioTrack;
-	RecordTask recordTask;
-	
-	File mFile = null;
-	String filePath = null;
-	private MediaRecorder mRecorder = null;
-    private MediaPlayer   mPlayer = null;
+	static final int RECORDER_BPP = 16;
+	static final int RECORDER_SAMPLERATE = 16000;
+	static final int RECORDER_CHANNELS = AudioFormat.CHANNEL_IN_MONO; 
+	static final int RECORDER_AUDIO_ENCODING = AudioFormat.ENCODING_PCM_16BIT;
+	AudioRecord recorder = null;
+	int bufferSize = 0;
+	Thread recordingThread = null;
+	String tempPath = null;
+	String wavPath = null;
 	
 	// data variables
 	HashMap<String, Integer> goodWordCounts;
@@ -193,26 +199,16 @@ public class RecorderActivity extends MotherBrain {
 		// setup current mic
 		currentMic = R.drawable.new_record_button;
 		
-		// setup sound recorder and audio track
-		int bufferSize = AudioRecord.getMinBufferSize(SAMPLE_RATE, AudioFormat.CHANNEL_IN_MONO,
-		        AudioFormat.ENCODING_PCM_16BIT);
-		buffer = new byte[bufferSize];
-		recorder = new AudioRecord(
-				MediaRecorder.AudioSource.MIC,
-				SAMPLE_RATE,
-				AudioFormat.CHANNEL_IN_MONO,
-		        AudioFormat.ENCODING_PCM_16BIT,
-		        bufferSize);
-		audioTrack = new AudioTrack(
-        		AudioManager.STREAM_MUSIC,
-        		SAMPLE_RATE,
-        		AudioFormat.CHANNEL_OUT_MONO,
-        		AudioFormat.ENCODING_PCM_16BIT,
-        		bufferSize,
-        		AudioTrack.MODE_STATIC);
+		// setup AudioRecord buffer
+		bufferSize = AudioRecord.getMinBufferSize(RECORDER_SAMPLERATE, RECORDER_CHANNELS, RECORDER_AUDIO_ENCODING);
 		
-		mFile = new File(getFilesDir(), "audiotest.3gp");
-		filePath = mFile.getAbsolutePath();
+		// create filepath for audio files
+		File dir = new File(Environment.getExternalStorageDirectory().getPath(), "PresentPerfect");
+		if(!dir.exists())
+			dir.mkdirs();
+		System.out.println(recName);
+		tempPath = dir + "/temp.pcm";
+		wavPath = dir + "/" + recName + ".wav";
 	}
 
 	@Override
@@ -245,11 +241,12 @@ public class RecorderActivity extends MotherBrain {
 	
 	// remove callbacks and create new intent
 	private void sendFeedbackIntent() {
+		Log.d("asdf", "Sending feedback intent!");
 		handler.removeCallbacks(updateTime);
 		handler.removeCallbacks(flashMic);
 
 		Intent recordIntent = new Intent(context, Info.class);
-		recordIntent.putExtra("recordPath", filePath);
+		recordIntent.putExtra("recordPath", wavPath);
 		Bundle data = new Bundle();
 		
 		data.putString("rec_name", recName);
@@ -283,6 +280,154 @@ public class RecorderActivity extends MotherBrain {
 		currentMic = resourceId;
 	}
 	
+	private void startRecording(){
+		recorder = new AudioRecord(MediaRecorder.AudioSource.MIC, RECORDER_SAMPLERATE, RECORDER_CHANNELS,RECORDER_AUDIO_ENCODING, bufferSize);
+		if(recorder.getState() == 1)
+			recorder.startRecording();
+		isRecording = true;
+		recordingThread = new Thread(new Runnable() {
+			@Override
+			public void run() {
+				writeAudioDataToFile();
+			}
+		},"AudioRecord Thread");
+		recordingThread.start();
+	}
+	
+	private void stopRecording(){
+		if(recorder != null){
+			isRecording = false;
+			if(recorder.getState() == 1)
+				recorder.stop();
+			recorder.release();
+			recorder = null;
+			recordingThread = null;
+		}
+		copyWaveFile(tempPath, wavPath);
+//		convertWaveToFlac(filePath + ".wav", filePath + ".flac");
+	}
+	
+	private void writeAudioDataToFile(){
+		byte data[] = new byte[bufferSize];
+		String filename = tempPath;
+		FileOutputStream os = null;
+		try {
+			os = new FileOutputStream(filename);
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+		int read = 0;
+		if(os != null){
+			while(isRecording){
+				read = recorder.read(data, 0, bufferSize);
+				if(read != AudioRecord.ERROR_INVALID_OPERATION){
+					try {
+						os.write(data);
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+				}
+			}
+			try {
+				os.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+	
+	private void copyWaveFile(String inFilename,String outFilename){
+		FileInputStream in = null;
+		FileOutputStream out = null;
+		long totalAudioLen = 0;
+		long totalDataLen = totalAudioLen + 36;
+		long longSampleRate = RECORDER_SAMPLERATE;
+		int channels = 1;
+		long byteRate = RECORDER_BPP * RECORDER_SAMPLERATE * channels/8;
+
+		byte[] data = new byte[bufferSize];
+
+		try {
+			in = new FileInputStream(inFilename);
+			out = new FileOutputStream(outFilename);
+			totalAudioLen = in.getChannel().size();
+			totalDataLen = totalAudioLen + 36;
+
+			writeWaveFileHeader(out, totalAudioLen, totalDataLen, longSampleRate, channels, byteRate);
+
+			while(in.read(data) != -1){
+				out.write(data);
+			}
+
+			in.close();
+			out.close();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	private void writeWaveFileHeader(FileOutputStream out, long totalAudioLen, long totalDataLen, long longSampleRate, int channels, long byteRate) throws IOException {
+		byte[] header = new byte[44];
+
+		header[0] = 'R';  // RIFF/WAVE header
+		header[1] = 'I';
+		header[2] = 'F';
+		header[3] = 'F';
+		header[4] = (byte) (totalDataLen & 0xff);
+		header[5] = (byte) ((totalDataLen >> 8) & 0xff);
+		header[6] = (byte) ((totalDataLen >> 16) & 0xff);
+		header[7] = (byte) ((totalDataLen >> 24) & 0xff);
+		header[8] = 'W';
+		header[9] = 'A';
+		header[10] = 'V';
+		header[11] = 'E';
+		header[12] = 'f';  // 'fmt ' chunk
+		header[13] = 'm';
+		header[14] = 't';
+		header[15] = ' ';
+		header[16] = 16;  // 4 bytes: size of 'fmt ' chunk
+		header[17] = 0;
+		header[18] = 0;
+		header[19] = 0;
+		header[20] = 1;  // format = 1
+		header[21] = 0;
+		header[22] = (byte) channels;
+		header[23] = 0;
+		header[24] = (byte) (longSampleRate & 0xff);
+		header[25] = (byte) ((longSampleRate >> 8) & 0xff);
+		header[26] = (byte) ((longSampleRate >> 16) & 0xff);
+		header[27] = (byte) ((longSampleRate >> 24) & 0xff);
+		header[28] = (byte) (byteRate & 0xff);
+		header[29] = (byte) ((byteRate >> 8) & 0xff);
+		header[30] = (byte) ((byteRate >> 16) & 0xff);
+		header[31] = (byte) ((byteRate >> 24) & 0xff);
+		header[32] = (byte) (2 * 16 / 8);  // block align
+		header[33] = 0;
+		header[34] = RECORDER_BPP;  // bits per sample
+		header[35] = 0;
+		header[36] = 'd';
+		header[37] = 'a';
+		header[38] = 't';
+		header[39] = 'a';
+		header[40] = (byte) (totalAudioLen & 0xff);
+		header[41] = (byte) ((totalAudioLen >> 8) & 0xff);
+		header[42] = (byte) ((totalAudioLen >> 16) & 0xff);
+		header[43] = (byte) ((totalAudioLen >> 24) & 0xff);
+
+		out.write(header, 0, 44);
+	}
+	
+//	private void convertWaveToFlac(String wavePath, String flacPath) {
+//		File in = new File(wavePath);
+//		File out = new File(flacPath);
+//		
+//		FLAC_FileEncoder ffe = new FLAC_FileEncoder();
+//		ffe.encode(in, out);
+//		Log.d("asdf", "Done converting to flac!");
+//	}
+	
 	// runnable for updating time
 	private Runnable updateTime = new Runnable() {
 		public void run() {
@@ -301,7 +446,7 @@ public class RecorderActivity extends MotherBrain {
 			handler.postDelayed(this, 1000);
 		}
 	};
-	
+
 	// runnable for indicating record mode (flashing)
 	private Runnable flashMic = new Runnable() {
 		public void run() {
@@ -316,13 +461,13 @@ public class RecorderActivity extends MotherBrain {
 			handler.postDelayed(this, 800);
 		}
 	};
-	
+
 	// class for handling stuff after animation
 	private class SlideListenerWithView implements AnimationListener {
 		View v;
 		// right = 1, left = -1
 		int direction;
-
+	
 		public SlideListenerWithView(View v, int direction) {
 			this.v = v;
 			this.direction = direction;
@@ -332,35 +477,15 @@ public class RecorderActivity extends MotherBrain {
 		public void onAnimationEnd(Animation animation) {
 			v.setX(v.getX() + direction * v.getWidth() * 0.5f);
 		}
-
+	
 		@Override
 		public void onAnimationRepeat(Animation animation) {
 		}
-
+	
 		@Override
 		public void onAnimationStart(Animation animation) {
 		}
 		
-	}
-	
-	// helper method for starting a new record task
-	public void runNewRecordTask() {
-		recordTask = new RecordTask();
-		recordTask.execute();
-	}
-	
-	// async task for recording in background thread
-	private class RecordTask extends AsyncTask<Void, Void, Void> {
-		@Override
-		protected Void doInBackground(Void... params) {
-			while(isRecording) {
-				bufReadResult = recorder.read(buffer, 0, buffer.length);
-				// TODO: make this into a track that can be played back
-								
-			}
-			recorder.stop();
-			return null;
-		}
 	}
 	
 	private class RecordButtonOnTouchListener extends ButtonOnTouchListener {
@@ -379,6 +504,7 @@ public class RecorderActivity extends MotherBrain {
 				}
 			} else {
 				if (isRecording || isPaused) {
+					stopRecording();
 					setRecordButtonImage(startResource);
 					sendFeedbackIntent();
 				} else {
@@ -392,9 +518,8 @@ public class RecorderActivity extends MotherBrain {
 					handler.postDelayed(updateTime, 800);
 					handler.postDelayed(flashMic, 200);
 					
-					// TODO: speech recognition
+					startRecording();
 				}
-				isRecording = !isRecording;
 			}
 			return false;
 		}
