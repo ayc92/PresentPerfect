@@ -33,6 +33,8 @@ public class ExpandableListFragment extends TabFragment {
 	ExpandableListView expListView;
 	ExpandableListAdapter listAdapter;
 	
+	
+	
 	private final int NONE_EXPANDED = -1;
     private int lastExpanded = NONE_EXPANDED;
     private final int ADD_CHILD = 0;
@@ -70,8 +72,6 @@ public class ExpandableListFragment extends TabFragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //setContentView(R.layout.main);
-        //setUpView();
         int SomeInt = getArguments().getInt("someInt", 0);   
         String someTitle = getArguments().getString("someTitle", "");
         tab = someTitle;
@@ -83,8 +83,10 @@ public class ExpandableListFragment extends TabFragment {
 		boolean shared = false;
 		if (tab.equals("shared")){
 			shared = true;
+			listAdapter = new ExpandableListAdapter(this, context, sharedListDataHeader, sharedListDataChild, shared);
+		} else {
+			listAdapter = new ExpandableListAdapter(this, context, pitchListDataHeader, pitchListDataChild, shared);
 		}
-		listAdapter = new ExpandableListAdapter(this, context, listDataHeader, listDataChild, shared);
 		expListView.setAdapter(listAdapter);
 		setUp();
 	}
@@ -263,12 +265,12 @@ public class ExpandableListFragment extends TabFragment {
 		SimpleDateFormat s = new SimpleDateFormat("MM-dd-yyyy");
 		String timeStamp = s.format(new Date()); // Find todays date
 		if (!(isGroup)) { //Adding a recording.
-			listDataChild.get(listDataHeader.get(which)).add(newest_input + " - " + timeStamp);
+			pitchListDataChild.get(pitchListDataHeader.get(which)).add(newest_input + " - " + timeStamp);
 		} else if (isGroup) { //Adding a project.
 			int size = listAdapter.getGroupCount();
-			listDataHeader.add(name);
+			pitchListDataHeader.add(name);
 			List<String>  new_group = new ArrayList<String>();
-			listDataChild.put(listDataHeader.get(size), new_group);
+			pitchListDataChild.put(pitchListDataHeader.get(size), new_group);
 		}
 		listAdapter.notifyDataSetChanged();
 		listAdapter.notifyDataSetInvalidated();
@@ -346,7 +348,7 @@ public class ExpandableListFragment extends TabFragment {
 	
 	private AlertDialog.Builder createParentDeleteDialog(int groupPos) {
 		removeInfo[0] = groupPos;
-		String parentName = listDataHeader.get(groupPos);
+		String parentName = pitchListDataHeader.get(groupPos);
 		AlertDialog.Builder alert = new AlertDialog.Builder(context);
 		alert.setTitle("Delete Project?");
 		alert.setMessage("Delete project: " + parentName + "?");
@@ -364,7 +366,7 @@ public class ExpandableListFragment extends TabFragment {
 	}
 
 	private void removeParent(int groupPosition) {
-		listDataHeader.remove(groupPosition);
+		pitchListDataHeader.remove(groupPosition);
 		//Deactivate Remove Mode
 		listAdapter.setRemoveParent(false);
 		listAdapter.setRemoveChild(false);
@@ -399,7 +401,7 @@ public class ExpandableListFragment extends TabFragment {
 	}
 	
 	private AlertDialog.Builder createChildDeleteDialog(int groupPos, int childPos) {
-		String childName = listDataChild.get(listDataHeader.get(groupPos)).get(childPos);
+		String childName = pitchListDataChild.get(pitchListDataHeader.get(groupPos)).get(childPos);
 		AlertDialog.Builder alert = new AlertDialog.Builder(context);
 		alert.setTitle("Delete recording?");
 		alert.setMessage("Delete recording: " + childName + "?");
@@ -417,7 +419,7 @@ public class ExpandableListFragment extends TabFragment {
 	}	
 	
 	private void removeChild() {
-		listDataChild.get(listDataHeader.get(removeInfo[0])).remove(removeInfo[1]);
+		pitchListDataChild.get(pitchListDataHeader.get(removeInfo[0])).remove(removeInfo[1]);
 		listAdapter.notifyDataSetChanged();
 		listAdapter.notifyDataSetInvalidated();
 	}
@@ -425,7 +427,9 @@ public class ExpandableListFragment extends TabFragment {
 	@Override
 	void prepareList() {
 		if (tab.equals("recordings")){
-			recordingsView();
+			if (pitchListDataHeader == null || pitchListDataHeader.size() == 0) {
+				recordingsView();
+			}
 		} else if(tab.equals("shared")){
 			sharedwithMeView();
 		}
@@ -435,15 +439,15 @@ public class ExpandableListFragment extends TabFragment {
 	}
 	
 	public void recordingsView(){
-		listDataHeader = new ArrayList<String>();
-        listDataChild = new HashMap<String, List<String>>();
+		pitchListDataHeader = new ArrayList<String>();
+        pitchListDataChild = new HashMap<String, List<String>>();
         
         // Adding projects/headers
-        listDataHeader.add("Google");
-        listDataHeader.add("Angel");
-        listDataHeader.add("Microsoft");
-        listDataHeader.add("Qualcomm");
-        listDataHeader.add("VC");
+        pitchListDataHeader.add("Google");
+        pitchListDataHeader.add("Angel");
+        pitchListDataHeader.add("Microsoft");
+        pitchListDataHeader.add("Qualcomm");
+        pitchListDataHeader.add("VC");
 	
         //Adding recordings/children
         // Adding child data
@@ -492,22 +496,22 @@ public class ExpandableListFragment extends TabFragment {
         five.add("Rec 6 - 04/03/14");
         five.add("Rec 7 - 04/07/14");
 	
-        listDataChild.put(listDataHeader.get(0), one);
-        listDataChild.put(listDataHeader.get(1), two);
-        listDataChild.put(listDataHeader.get(2), three);
-        listDataChild.put(listDataHeader.get(3), four);
-        listDataChild.put(listDataHeader.get(4), five);
+        pitchListDataChild.put(pitchListDataHeader.get(0), one);
+        pitchListDataChild.put(pitchListDataHeader.get(1), two);
+        pitchListDataChild.put(pitchListDataHeader.get(2), three);
+        pitchListDataChild.put(pitchListDataHeader.get(3), four);
+        pitchListDataChild.put(pitchListDataHeader.get(4), five);
 	}
 	public void sharedwithMeView(){
-		listDataHeader = new ArrayList<String>();
-        listDataChild = new HashMap<String, List<String>>();
+		sharedListDataHeader = new ArrayList<String>();
+        sharedListDataChild = new HashMap<String, List<String>>();
         
         // Adding projects/headers
-        listDataHeader.add("Bob H.'s recordings");
-        listDataHeader.add("Angel's recordings");
-        listDataHeader.add("King Henry's recordings");
-        listDataHeader.add("Mr. Clean's recordings");
-        listDataHeader.add("Zoo's recordings");
+        sharedListDataHeader.add("Bob H.'s recordings");
+        sharedListDataHeader.add("Angel's recordings");
+        sharedListDataHeader.add("King Henry's recordings");
+        sharedListDataHeader.add("Mr. Clean's recordings");
+        sharedListDataHeader.add("Zoo's recordings");
 	
         //Adding recordings/children
         // Adding child data
@@ -556,11 +560,11 @@ public class ExpandableListFragment extends TabFragment {
         five.add("Rec 6 - 04/03/14");
         five.add("Rec 7 - 04/07/14");
 	
-        listDataChild.put(listDataHeader.get(0), one);
-        listDataChild.put(listDataHeader.get(1), two);
-        listDataChild.put(listDataHeader.get(2), three);
-        listDataChild.put(listDataHeader.get(3), four);
-        listDataChild.put(listDataHeader.get(4), five);
+        sharedListDataChild.put(sharedListDataHeader.get(0), one);
+        sharedListDataChild.put(sharedListDataHeader.get(1), two);
+        sharedListDataChild.put(sharedListDataHeader.get(2), three);
+        sharedListDataChild.put(sharedListDataHeader.get(3), four);
+        sharedListDataChild.put(sharedListDataHeader.get(4), five);
 	}
 	
 	
