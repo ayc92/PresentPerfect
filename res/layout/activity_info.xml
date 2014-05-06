@@ -215,6 +215,7 @@
     	android:paddingBottom="20dp"
     	android:hint="Type notes here"
     />
+
 			</LinearLayout>
 		<!--
 			     <ImageView
@@ -227,6 +228,10 @@
     	android:onClick="shareAction"
         android:src="@drawable/shareblue" />
         -->
+        			<View
+            android:layout_width="0dp"
+            android:layout_height="20dp"
+            />
 </LinearLayout>
 </ScrollView>
 </LinearLayout>
