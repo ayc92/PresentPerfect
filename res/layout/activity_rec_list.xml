@@ -36,6 +36,9 @@
    	    android:layout_height="wrap_content"
    	    android:background="@drawable/border"
    	    android:orientation="horizontal"
+   	    android:divider="@drawable/custom_divider"
+    	android:showDividers="middle"
+    	android:paddingBottom="8dp"
    	    android:layout_alignParentBottom="true" >
    
    	    <Button
@@ -50,7 +53,7 @@
    	        android:background="@color/mod_black"/>
    	    
    	    <View
-		    android:layout_width="1dp"
+		    android:layout_width="0dp"
 		    android:layout_height="match_parent"
 		    android:background="@color/background" />
    	    
