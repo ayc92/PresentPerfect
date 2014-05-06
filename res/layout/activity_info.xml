@@ -26,14 +26,7 @@
     android:background="#04476d"
     android:gravity="center_horizontal"
     android:layout_height="wrap_content">
-     <ImageView
-        android:id="@+id/skipback"
-        android:layout_width="35dp"
-        android:layout_height="35dp"
-        android:layout_marginRight="45dp"
-        android:layout_gravity="center_vertical"
-        android:background="@android:color/transparent"
-        android:src="@drawable/skipb" />
+    
     <ImageView
         android:id="@+id/playrec"
         android:layout_width="35dp"
@@ -41,14 +34,7 @@
         android:layout_gravity="center_vertical"
         android:background="@android:color/transparent"
         android:src="@drawable/playb" />
-        <ImageView
-        android:id="@+id/skipforward"
-        android:layout_width="35dp"
-        android:layout_height="35dp"
-        android:layout_marginLeft="45dp"
-        android:layout_gravity="center_horizontal|center_vertical"
-        android:background="@android:color/transparent"
-        android:src="@drawable/skipf" />
+
     </LinearLayout>
 <TextView
     	android:id="@+id/speechtime"
