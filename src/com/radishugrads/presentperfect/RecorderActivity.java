@@ -94,12 +94,10 @@ public class RecorderActivity extends MotherBrain {
 		setContentView(R.layout.recording);
 		
 		context = this;
-		
 		// get params
 		goodWordCounts = new HashMap<String, Integer>();
 		badWordCounts = new HashMap<String, Integer>();
 		allWordCounts = new HashMap<String, Integer>();
-		
 		params = getIntent().getExtras();
 		recName = params.getString("rec_name");
 		// format action bar
@@ -129,7 +127,6 @@ public class RecorderActivity extends MotherBrain {
 			}
 		} else {
 			// initialize params first
-			params = new Bundle();
 			params.putStringArrayList("good_items", new ArrayList<String>());
 			params.putStringArrayList("bad_items", new ArrayList<String>());
 			params.putStringArrayList("all_items", new ArrayList<String>());
