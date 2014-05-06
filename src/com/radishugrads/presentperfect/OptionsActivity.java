@@ -90,6 +90,9 @@ public class OptionsActivity extends MotherBrain {
 		currList = 0;
 		buzzwords = (ImageButton) findViewById(R.id.wordslist);
 		placeholder = (TextView) findViewById(R.id.placeholdr);
+		if(all_items.size() > 0){
+			placeholder.setVisibility(View.GONE);
+		}
 		include = true;
 		adapter = new buzzlistAdapter(items, this);
 
@@ -101,9 +104,10 @@ public class OptionsActivity extends MotherBrain {
 		spinner1 = (Spinner) findViewById(R.id.spinner_op);
 		spinner1.setOnItemSelectedListener(new SpinnerActivity2());
 		NumberPicker np = (NumberPicker) findViewById(R.id.numberPicker1);
+		np.setDescendantFocusability(NumberPicker.FOCUS_BLOCK_DESCENDANTS);
 		np.setMaxValue(60);
-		np.setMinValue(0);
-		np.setValue(5);
+		np.setMinValue(1);
+		np.setValue(min);
 		np.setOnValueChangedListener( new NumberPicker.
 	            OnValueChangeListener() {
 	            @Override
@@ -112,6 +116,11 @@ public class OptionsActivity extends MotherBrain {
 	                min = newVal;
 	            }
 	        });
+		
+		if (!timer){
+			RadioButton stopw = (RadioButton) findViewById(R.id.radioStopwatch);
+			stopw.setChecked(true);
+		}
 	}
 	
 	@Override
