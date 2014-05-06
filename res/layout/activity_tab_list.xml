@@ -15,7 +15,8 @@
         android:id="@+id/list"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:layout_below="@id/list_top_shadow1" />
+        android:layout_above="@id/bottom_bar" />
+
    		   	<FrameLayout
         android:id="@+id/list_bot_shadow1"
         android:layout_above="@+id/bottom_bar"
