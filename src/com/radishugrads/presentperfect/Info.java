@@ -116,7 +116,7 @@ public class Info extends MotherBrain implements Handler.Callback {
 		if (!over_time) {
 			time_f.setText(String.format("Speech time: %1$02d:%2$02d", actual_min, actual_sec));
 		}
-		if (wpm > 150 || wpm < 130){
+		if (wpm > 150 || wpm < 90){
 			speed_f.setBackgroundColor(Color.parseColor("#D22027"));
 		}
 		speed_f.setText("Speed: " + wpm + " wpm");
@@ -416,6 +416,10 @@ public class SpinnerActivity1 extends Activity implements OnItemSelectedListener
 		String transcription = (String) msg.obj;
 		Log.d("asdf", "Transcription: " + transcription);
 		String[] wordArray = transcription.split(" ");
+		int numWds = wordArray.length;
+		wpm = (int) (numWds / (actual_min + (actual_sec / 60.0)));
+		((TextView) findViewById(R.id.wordspermin)).setText("Speed: "+wpm+" wpm");
+		// buzzword counts
 		int[] goodCount = new int[good_items.size()];
 		int[] badCount = new int[bad_items.size()];
 		for(String word : wordArray) {
