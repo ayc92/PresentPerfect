@@ -15,6 +15,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
@@ -135,7 +136,8 @@ public class Info extends MotherBrain implements Handler.Callback {
 		spinner1 = (Spinner) findViewById(R.id.spinner1);
 		spinner1.setOnItemSelectedListener(new SpinnerActivity1());
 		updateList_comments();
-		filePath = getIntent().getStringExtra("recordPath");
+		File dir = new File(Environment.getExternalStorageDirectory().getPath(), "PresentPerfect");
+		filePath = dir + "/" + getIntent().getStringExtra("rec_name") + ".wav";
 		speechToText();
 	}
 
@@ -408,6 +410,11 @@ public class SpinnerActivity1 extends Activity implements OnItemSelectedListener
 	}
 	
 	private void speechToText() {
+		File f = new File(filePath);
+		if(!f.exists()){
+			Log.d("asdf", "speechToText on nonexistant file");
+			return;
+		}
 		RecognitionV2 r = new RecognitionV2(handler, filePath);
 		new Thread(r, "Speech2Text thread").start();
 	}

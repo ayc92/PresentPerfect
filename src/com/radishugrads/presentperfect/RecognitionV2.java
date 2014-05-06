@@ -36,6 +36,8 @@ public class RecognitionV2 implements Runnable{
 	
 	public void run() {
 		String s = test("0", filePath);
+		if(s == "") // nothing returned so don't even do anything
+			return;
 		Message msg = new Message();
 		msg.obj = s;
 		handler.sendMessage(msg);
@@ -84,7 +86,7 @@ public class RecognitionV2 implements Runnable{
 				Log.d("asdf", "result is " + result);
 				int pos = result.indexOf("transcript");
 				if(pos == -1) {
-					return "no transcript";
+					return "";
 				} else {
 					pos += 13; //skip to beginning of actual text
 					int endPos = result.indexOf("\"", pos); // find ending quote
@@ -99,6 +101,6 @@ public class RecognitionV2 implements Runnable{
 			Log.d("asdf", "exception in Recognition.test");
 		}
 		
-		return "**ERROR**";
+		return "";
 	}
 }

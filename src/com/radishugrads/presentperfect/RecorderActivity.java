@@ -85,7 +85,8 @@ public class RecorderActivity extends MotherBrain {
 	AudioRecord recorder = null;
 	int bufferSize = 0;
 	Thread recordingThread = null;
-	String filePath = null;
+	String tempPath = null;
+	String wavPath = null;
 	
 	// data variables
 	HashMap<String, Integer> goodWordCounts;
@@ -208,7 +209,9 @@ public class RecorderActivity extends MotherBrain {
 		File dir = new File(Environment.getExternalStorageDirectory().getPath(), "PresentPerfect");
 		if(!dir.exists())
 			dir.mkdirs();
-		filePath = dir.getPath() + "/temp";
+		System.out.println(recName);
+		tempPath = dir + "/temp.pcm";
+		wavPath = dir + "/" + recName + ".wav";
 	}
 
 	@Override
@@ -246,7 +249,7 @@ public class RecorderActivity extends MotherBrain {
 		handler.removeCallbacks(flashMic);
 
 		Intent recordIntent = new Intent(context, Info.class);
-		recordIntent.putExtra("recordPath", filePath + ".wav");
+		recordIntent.putExtra("recordPath", wavPath);
 		Bundle data = new Bundle();
 		
 		data.putString("rec_name", recName);
@@ -303,13 +306,13 @@ public class RecorderActivity extends MotherBrain {
 			recorder = null;
 			recordingThread = null;
 		}
-		copyWaveFile(filePath + ".pcm", filePath + ".wav");
+		copyWaveFile(tempPath, wavPath);
 //		convertWaveToFlac(filePath + ".wav", filePath + ".flac");
 	}
 	
 	private void writeAudioDataToFile(){
 		byte data[] = new byte[bufferSize];
-		String filename = filePath + ".pcm";
+		String filename = tempPath;
 		FileOutputStream os = null;
 		try {
 			os = new FileOutputStream(filename);
