@@ -437,7 +437,12 @@ public class SpinnerActivity1 extends Activity implements OnItemSelectedListener
 		String[] wordArray = transcription.split(" ");
 		int numWds = wordArray.length;
 		wpm = (int) (numWds / (actual_min + (actual_sec / 60.0)));
-		((TextView) findViewById(R.id.wordspermin)).setText("Speed: "+wpm+" wpm");
+		TextView wpmView = ((TextView) findViewById(R.id.wordspermin));
+		wpmView.setText("Speed: "+wpm+" wpm");
+		if (wpm > 150 || wpm < 60){
+			wpmView.setBackgroundColor(Color.parseColor("#D22027"));
+		}
+		wpmView.invalidate();
 		// buzzword counts
 		int[] goodCount = new int[good_items.size()];
 		int[] badCount = new int[bad_items.size()];
@@ -476,18 +481,18 @@ public class SpinnerActivity1 extends Activity implements OnItemSelectedListener
 		public void run() {
 			switch (currentImage) {
 				case R.drawable.playb_pressed:
+					mediaButton.setImageResource(R.drawable.pauseb);
 					if (mPlayer == null) {
 						playback();
 					} else {
 						mPlayer.start();
 					}
-					mediaButton.setImageResource(R.drawable.pauseb);
 					break;
 				case R.drawable.pauseb_pressed:
+					mediaButton.setImageResource(R.drawable.playb);
 					if (mPlayer != null && mPlayer.isPlaying()) {
 						mPlayer.stop();
 					}
-					mediaButton.setImageResource(R.drawable.playb);
 					break;
 					
 			}
@@ -511,10 +516,30 @@ public class SpinnerActivity1 extends Activity implements OnItemSelectedListener
 			if (event.getAction() == android.view.MotionEvent.ACTION_DOWN) {
 				if (isPlaying) { //Pause Button Showing
 					changeImage(downEndResource);
+					mPlayer.stop();
+					mPlayer.release();
+					mPlayer = null;
 				} else { //Play Button Showing
 					changeImage(downStartResource);
+					
+					if(mPlayer != null) {
+						mPlayer.release();
+						mPlayer = null;
+					}
+					mPlayer = new MediaPlayer();
+			        try {
+						File mFile = new File(filePath);
+				    	FileInputStream inputStream = new FileInputStream(mFile);
+				    	mPlayer.setDataSource(inputStream.getFD());
+				    	inputStream.close();
+			            mPlayer.prepare();
+			            mPlayer.start();
+			        } catch (IOException e) {
+			            Log.e("", "playback failed");
+			        }
 				}
 				changeImage = true;
+				
 			}
 			else {
 				if (changeImage) {
@@ -523,7 +548,7 @@ public class SpinnerActivity1 extends Activity implements OnItemSelectedListener
 					isPlaying = !isPlaying;
 				}
 			} 
-			return false;
+			return true;
 		}
 	}
 
