@@ -133,6 +133,7 @@ public class Info extends MotherBrain {
 		spinner1.setOnItemSelectedListener(new SpinnerActivity1());
 		updateList_comments();
 		filePath = getFilesDir() + "/audiotest.3gp";
+		
 	}
 
 	@Override
@@ -352,6 +353,7 @@ public class SpinnerActivity1 extends Activity implements OnItemSelectedListener
 	}
 
 	public void playback(View v) {
+		//Change play button to pause here
 		mPlayer = new MediaPlayer();
         try {
 			File mFile = new File(filePath);
