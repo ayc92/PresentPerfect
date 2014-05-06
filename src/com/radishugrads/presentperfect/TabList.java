@@ -20,6 +20,7 @@ import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ListAdapter;
@@ -72,7 +73,9 @@ public class TabList extends Fragment {
 		View currentTabView = inflater.inflate(R.layout.activity_tab_list, container, false);
 		if (tab.equals("notifications")){
 			LinearLayout bottom = (LinearLayout) currentTabView.findViewById(R.id.bottom_bar);
+			FrameLayout bottomShadow = (FrameLayout) currentTabView.findViewById(R.id.list_bot_shadow1);
         	bottom.setVisibility(View.GONE);
+        	bottomShadow.setVisibility(View.GONE);
         	adapter = new tabAdapter(notifications, getActivity());
         } else {
         	adapter = new tabAdapter(contacts, getActivity());
