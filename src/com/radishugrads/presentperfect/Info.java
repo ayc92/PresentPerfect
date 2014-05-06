@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 
 import android.app.Activity;
@@ -370,17 +371,18 @@ public class SpinnerActivity1 extends Activity implements OnItemSelectedListener
 	}
 	
 	public void updateList(){
+		Log.d("asdf", "starting updateList()");
 		LinearLayout countList = (LinearLayout) findViewById(R.id.countList);
 		countList.removeAllViews();
 		LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		for (int i = 0; i < counts.size(); i++){
 			View view;
-		    Log.d("OOOO", "INNNNN"); 
+//		    Log.d("OOOO", "INNNNN"); 
 		    view = inflater.inflate(R.layout.wordcountlist, null);
-		    Log.d("OOOO", "INNNN222");
+//		    Log.d("OOOO", "INNNN222");
 		    TextView listNum = (TextView)view.findViewById(R.id.numbercount); 
 		    listNum.setText("" + counts.get(i));
-		    Log.d("OOOO", "IN 33333");
+//		    Log.d("OOOO", "IN 33333");
 		    TextView listWord = (TextView)view.findViewById(R.id.wordofnum); 
 		    listWord.setText(words.get(i));
 		    countList.addView(view);
@@ -392,12 +394,12 @@ public class SpinnerActivity1 extends Activity implements OnItemSelectedListener
 		LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		for (int i = 0; i < comments.length; i++){
 			View view;
-		    Log.d("OOOO", "INNNNN"); 
+//		    Log.d("OOOO", "INNNNN"); 
 		    view = inflater.inflate(R.layout.commentslist, null);
-		    Log.d("OOOO", "INNNN222");
+//		    Log.d("OOOO", "INNNN222");
 		    TextView listUser = (TextView)view.findViewById(R.id.commentuser); 
 		    listUser.setText("Bob says"); 
-		    Log.d("OOOO", "IN 33333");
+//		    Log.d("OOOO", "IN 33333");
 		    TextView listComment = (TextView)view.findViewById(R.id.commenttext); 
 		    listComment.setText(comments[i]);
 		    comment_view.addView(view);
@@ -406,27 +408,42 @@ public class SpinnerActivity1 extends Activity implements OnItemSelectedListener
 	}
 	
 	private void speechToText() {
-		Recognition r = new Recognition(handler, filePath);
+		RecognitionV2 r = new RecognitionV2(handler, filePath);
 		new Thread(r, "Speech2Text thread").start();
 	}
 	
 	public boolean handleMessage(Message msg) {
 		String transcription = (String) msg.obj;
 		Log.d("asdf", "Transcription: " + transcription);
-		HashMap<String, Integer> hm = new HashMap<String, Integer>();
 		String[] wordArray = transcription.split(" ");
+		int[] goodCount = new int[good_items.size()];
+		int[] badCount = new int[bad_items.size()];
 		for(String word : wordArray) {
-			for(int i = 0; i < words.size(); i++) {
-				if( word.toLowerCase().equals(words.get(i).toLowerCase()) ) {
-					if(hm.get(word) == null)
-						hm.put(word, 1);
-					else
-						hm.put(word, hm.get(word) + 1);
+			for(int i = 0; i < good_items.size(); i++) {
+				if( word.toLowerCase().equals(good_items.get(i).toLowerCase()) ) {
+					goodCount[i] ++;
+				}
+			}
+			for(int i = 0; i < bad_items.size(); i++) {
+				if( word.toLowerCase().equals(bad_items.get(i).toLowerCase()) ) {
+					badCount[i] ++;
 				}
 			}
 		}
-		words = new ArrayList<String>(hm.keySet());
-		counts = new ArrayList<Integer>(hm.values());
+		good_counts = new ArrayList<Integer>();
+		for(int c : goodCount) {
+			good_counts.add(c);
+		}
+		bad_counts = new ArrayList<Integer>();
+		for(int c : badCount) {
+			bad_counts.add(c);
+		}
+		all_items = new ArrayList<String>();
+		all_items.addAll(good_items);
+		all_items.addAll(bad_items);
+		all_counts = new ArrayList<Integer>();
+		all_counts.addAll(good_counts);
+		all_counts.addAll(bad_counts);
 		updateList();
 		return true;
 	}

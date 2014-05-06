@@ -239,7 +239,7 @@ public class RecorderActivity extends MotherBrain {
 		handler.removeCallbacks(flashMic);
 
 		Intent recordIntent = new Intent(context, Info.class);
-		recordIntent.putExtra("recordPath", filePath + ".flac");
+		recordIntent.putExtra("recordPath", filePath + ".wav");
 		Bundle data = new Bundle();
 		data.putBoolean("is_timer", isTimer);
 		if (!isTimer) {
