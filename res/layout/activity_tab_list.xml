@@ -15,7 +15,7 @@
         android:id="@+id/list"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:layout_below="@id/list_top_shadow1" />
+        android:layout_above="@id/bottom_bar" />
    		   	<FrameLayout
         android:id="@+id/list_bot_shadow1"
         android:layout_above="@+id/bottom_bar"
@@ -23,38 +23,38 @@
         android:layout_height="5dp"
         android:background="@drawable/shadow_2" >
          </FrameLayout>
-    	<LinearLayout
-    	    android:id="@+id/bottom_bar"
-    	    android:layout_width="fill_parent"
-    	    android:layout_height="wrap_content"
-    	    android:background="@drawable/border"
-    	    android:orientation="horizontal"
-    	    android:layout_alignParentBottom="true"
-    	    android:divider="@drawable/custom_divider"
-    	    android:showDividers="middle"
-    	    android:dividerPadding="0dp">
-    
-    
-    	    <Button
-    	        android:id="@+id/addProject" 
-    	        android:layout_height="fill_parent"
-    	        android:layout_width="0dp"
-    	        android:layout_weight="1"
-    	        android:text="Add"
-    	        android:gravity="center"
-    	        android:textColor="@color/background"
-    	        android:background="@color/mod_black"/>
-    	    
-    	    <Button
-    	        android:id="@+id/removeParent" 
-    	        android:layout_height="fill_parent"
-    	        android:layout_width="0dp"
-    	        android:layout_weight="1"
-    	        android:text="Remove"
-    	        android:gravity="center"
-    	        android:textColor="@color/background"
-    	        android:background="@color/mod_black"/>
-    	</LinearLayout>
-   		
+	<LinearLayout
+   	    android:id="@id/bottom_bar"
+   	    android:layout_width="fill_parent"
+   	    android:layout_height="wrap_content"
+   	    android:background="@drawable/border"
+   	    android:orientation="horizontal"
+   	    android:divider="@drawable/custom_divider"
+    	android:showDividers="middle"
+    	android:paddingBottom="8dp"
+   	    android:layout_alignParentBottom="true" >
+   
+   	    <Button
+   	        android:id="@+id/addProject" 
+   	        android:layout_height="30dp"
+   	        android:layout_width="0dp"
+   	        android:layout_weight="1"
+   	        android:text="Add"
+   	        android:gravity="center_horizontal|center_vertical"
+   	        android:paddingBottom="10dp"
+   	        android:textColor="@color/background"
+   	        android:background="@color/mod_black"/>
+   	    
+   	    <Button
+   	        android:id="@+id/removeParent" 
+   	        android:layout_height="30dp"
+   	        android:layout_width="0dp"
+   	        android:layout_weight="1"
+   	        android:text="Remove"
+   	        android:gravity="center_horizontal|center_vertical"
+   	        android:paddingBottom="10dp"
+   	        android:textColor="@color/background"
+   	        android:background="@color/mod_black"/>
+   	</LinearLayout>
                 
 </RelativeLayout>
