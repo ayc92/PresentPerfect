@@ -8,7 +8,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import com.radishugrads.presentperfect.flacLibrary.FLAC_FileEncoder;
+//import com.radishugrads.presentperfect.flacLibrary.FLAC_FileEncoder;
 
 import android.content.Context;
 import android.content.Intent;
@@ -295,7 +295,7 @@ public class RecorderActivity extends MotherBrain {
 			recordingThread = null;
 		}
 		copyWaveFile(filePath + ".pcm", filePath + ".wav");
-		convertWaveToFlac(filePath + ".wav", filePath + ".flac");
+//		convertWaveToFlac(filePath + ".wav", filePath + ".flac");
 	}
 	
 	private void writeAudioDataToFile(){
@@ -410,14 +410,14 @@ public class RecorderActivity extends MotherBrain {
 		out.write(header, 0, 44);
 	}
 	
-	private void convertWaveToFlac(String wavePath, String flacPath) {
-		File in = new File(wavePath);
-		File out = new File(flacPath);
-		
-		FLAC_FileEncoder ffe = new FLAC_FileEncoder();
-		ffe.encode(in, out);
-		Log.d("asdf", "Done converting to flac!");
-	}
+//	private void convertWaveToFlac(String wavePath, String flacPath) {
+//		File in = new File(wavePath);
+//		File out = new File(flacPath);
+//		
+//		FLAC_FileEncoder ffe = new FLAC_FileEncoder();
+//		ffe.encode(in, out);
+//		Log.d("asdf", "Done converting to flac!");
+//	}
 	
 	// runnable for updating time
 	private Runnable updateTime = new Runnable() {
