@@ -148,9 +148,6 @@ public class Info extends MotherBrain {
 				R.drawable.pauseb,
 				R.drawable.pauseb_pressed));
 		
-//		Intent intent = getIntent();
-//		filePath = intent.getExtras().getString("recordPath");
-		
 	}
 
 	@Override
@@ -423,18 +420,20 @@ public class SpinnerActivity1 extends Activity implements OnItemSelectedListener
 		public void run() {
 			switch (currentImage) {
 				case R.drawable.playb_pressed:
+					System.out.println("changing to pause");
+					mediaButton.setImageResource(R.drawable.pauseb);
 					if (mPlayer == null) {
 						playback();
 					} else {
 						mPlayer.start();
 					}
-					mediaButton.setImageResource(R.drawable.pauseb);
 					break;
 				case R.drawable.pauseb_pressed:
+					System.out.println("changing to play");
+					mediaButton.setImageResource(R.drawable.playb);
 					if (mPlayer != null && mPlayer.isPlaying()) {
 						mPlayer.stop();
 					}
-					mediaButton.setImageResource(R.drawable.playb);
 					break;
 					
 			}
@@ -456,6 +455,7 @@ public class SpinnerActivity1 extends Activity implements OnItemSelectedListener
 		@Override
 		public boolean onTouch(View v, MotionEvent event) {
 			if (event.getAction() == android.view.MotionEvent.ACTION_DOWN) {
+				System.out.println("ACTION DOWN");
 				if (isPlaying) { //Pause Button Showing
 					changeImage(downEndResource);
 				} else { //Play Button Showing
@@ -464,13 +464,15 @@ public class SpinnerActivity1 extends Activity implements OnItemSelectedListener
 				changeImage = true;
 			}
 			else {
+				System.out.println("ACTION UP");
 				if (changeImage) {
+					System.out.println("finish push = change image is true");
 					myHandler.postDelayed(finishPush, 200);
 					changeImage = false;
 					isPlaying = !isPlaying;
 				}
 			} 
-			return false;
+			return true;
 		}
 	}
 
