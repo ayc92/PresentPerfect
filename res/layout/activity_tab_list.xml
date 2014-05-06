@@ -20,7 +20,7 @@
     	    android:layout_alignParentBottom="true"
     	    android:divider="@drawable/custom_divider"
     	    android:showDividers="middle"
-    	    android:dividerPadding="2dp">
+    	    android:dividerPadding="0dp">
     
     
     	    <Button
