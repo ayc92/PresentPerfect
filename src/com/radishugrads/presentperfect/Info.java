@@ -424,7 +424,6 @@ public class SpinnerActivity1 extends Activity implements OnItemSelectedListener
 		public void run() {
 			switch (currentImage) {
 				case R.drawable.playb_pressed:
-					System.out.println("Changing to pause");
 					if (mPlayer == null) {
 						playback();
 					} else {
