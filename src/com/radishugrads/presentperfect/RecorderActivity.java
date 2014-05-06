@@ -6,6 +6,7 @@ import java.util.HashMap;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.media.AudioFormat;
 import android.media.AudioManager;
 import android.media.AudioRecord;
@@ -283,6 +284,7 @@ public class RecorderActivity extends MotherBrain {
 	private Runnable updateTime = new Runnable() {
 		public void run() {
 			if (isTimer) {
+				System.out.println(timeInSecs + " seconds left!");
 				if (timeInSecs == 0) {
 					setRecordButtonImage(R.drawable.new_record_button);
 					sendFeedbackIntent();
