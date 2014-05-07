@@ -28,6 +28,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.BaseAdapter;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListAdapter;
@@ -35,7 +36,7 @@ import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-public class Info extends MotherBrain implements Handler.Callback {
+public class Info extends MotherBrain implements Handler.Callback, MediaPlayer.OnCompletionListener {
 	int actual_min;
 	int actual_sec;
 	int target_min;
@@ -370,8 +371,9 @@ public class SpinnerActivity1 extends Activity implements OnItemSelectedListener
 			alertDialog.show();
 	}
 
-	public void playback() {
+	public void playbackStart() {
 		mPlayer = new MediaPlayer();
+		mPlayer.setOnCompletionListener(this);
         try {
 			File mFile = new File(filePath);
 	    	FileInputStream inputStream = new FileInputStream(mFile);
@@ -382,6 +384,12 @@ public class SpinnerActivity1 extends Activity implements OnItemSelectedListener
         } catch (IOException e) {
             Log.e("", "prepare() failed");
         }
+	}
+	
+	public void playbackStop() {
+		mPlayer.stop();
+		mPlayer.release();
+		mPlayer = null;
 	}
 	
 	public void updateList(){
@@ -475,6 +483,11 @@ public class SpinnerActivity1 extends Activity implements OnItemSelectedListener
 		updateList();
 		return true;
 	}
+	
+	public void onCompletion(MediaPlayer mp) {
+		((ImageView) findViewById(R.id.playrec)).performClick();
+		playbackStop();
+	}
 
 		
 	private Runnable finishPush = new Runnable() {
@@ -483,7 +496,7 @@ public class SpinnerActivity1 extends Activity implements OnItemSelectedListener
 				case R.drawable.playb_pressed:
 					mediaButton.setImageResource(R.drawable.pauseb);
 					if (mPlayer == null) {
-						playback();
+						playbackStart();
 					} else {
 						mPlayer.start();
 					}
@@ -516,27 +529,8 @@ public class SpinnerActivity1 extends Activity implements OnItemSelectedListener
 			if (event.getAction() == android.view.MotionEvent.ACTION_DOWN) {
 				if (isPlaying) { //Pause Button Showing
 					changeImage(downEndResource);
-					mPlayer.stop();
-					mPlayer.release();
-					mPlayer = null;
 				} else { //Play Button Showing
 					changeImage(downStartResource);
-					
-					if(mPlayer != null) {
-						mPlayer.release();
-						mPlayer = null;
-					}
-					mPlayer = new MediaPlayer();
-			        try {
-						File mFile = new File(filePath);
-				    	FileInputStream inputStream = new FileInputStream(mFile);
-				    	mPlayer.setDataSource(inputStream.getFD());
-				    	inputStream.close();
-			            mPlayer.prepare();
-			            mPlayer.start();
-			        } catch (IOException e) {
-			            Log.e("", "playback failed");
-			        }
 				}
 				changeImage = true;
 				
