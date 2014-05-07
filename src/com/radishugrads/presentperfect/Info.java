@@ -62,7 +62,7 @@ public class Info extends MotherBrain implements Handler.Callback {
 	ArrayList<Integer> counts;
 	ArrayList<String> chosen_contacts;
 	wordCountAdapter adapter;
-	String contacts[] = {"Angel", "Beyonce", "Bob", "King Henry", "Mr. Clean", "Zoo"};
+	String contacts[] = {"Angel", "Beyonce", "Bob", "Henry", "Mr. Clean", "Zoo"};
 	String comments[] = {"work a little more on your enthusiasm. good use of stories", "7/10 needs more oomph"};
 	Spinner spinner1;
 	LinearLayout firstPanel;
@@ -412,7 +412,7 @@ public class SpinnerActivity1 extends Activity implements OnItemSelectedListener
 		    view = inflater.inflate(R.layout.commentslist, null);
 //		    Log.d("OOOO", "INNNN222");
 		    TextView listUser = (TextView)view.findViewById(R.id.commentuser); 
-		    listUser.setText("Bob says"); 
+		    listUser.setText(contacts[i+2]+ " says"); 
 //		    Log.d("OOOO", "IN 33333");
 		    TextView listComment = (TextView)view.findViewById(R.id.commenttext); 
 		    listComment.setText(comments[i]);
