@@ -77,6 +77,7 @@ public class Info extends MotherBrain implements Handler.Callback, MediaPlayer.O
 	boolean is_timer;
 	boolean over_time;
 	Bundle data;
+	boolean firstTime;
 	
 	private MediaPlayer mPlayer = null;
 	String filePath = null;
@@ -86,7 +87,7 @@ public class Info extends MotherBrain implements Handler.Callback, MediaPlayer.O
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_info);
-		
+		firstTime=true;
 		myHandler = new Handler();
 		data = getIntent().getExtras();
 		// format action bar
@@ -106,12 +107,9 @@ public class Info extends MotherBrain implements Handler.Callback, MediaPlayer.O
 		
 		all_items = new ArrayList<String>(((HashMap<String, Integer>) data.getSerializable("all")).keySet());
 		all_counts = new ArrayList<Integer>(((HashMap<String, Integer>) data.getSerializable("all")).values());
-		
+//		
 		words = new ArrayList<String>();
-		words.addAll(all_items);
 		counts = new ArrayList<Integer>();
-		counts.addAll(all_counts);
-		updateList();
 		
 		mediaButton = (ImageView) findViewById(R.id.playrec);
 
@@ -128,10 +126,6 @@ public class Info extends MotherBrain implements Handler.Callback, MediaPlayer.O
 		if (!over_time) {
 			time_f.setText(String.format("Speech time: %1$02d:%2$02d", actual_min, actual_sec));
 		}
-		if (wpm > 150 || wpm < 90){
-			speed_f.setBackgroundColor(Color.parseColor("#D22027"));
-		}
-		speed_f.setText("Speed: " + wpm + " wpm");
 		
 		wordVisib = false;
 		commentVisib = false;
@@ -302,6 +296,10 @@ public class SpinnerActivity1 extends Activity implements OnItemSelectedListener
 	    
 	    public void onItemSelected(AdapterView<?> parent, View view, 
 	            int pos, long id) {
+	    	if(firstTime){
+	    		firstTime = false;
+	    		return;
+	    	}
 	    	String selected = parent.getItemAtPosition(pos).toString();
 	    	words.clear();
 	    	counts.clear();
@@ -480,6 +478,8 @@ public class SpinnerActivity1 extends Activity implements OnItemSelectedListener
 		all_counts = new ArrayList<Integer>();
 		all_counts.addAll(good_counts);
 		all_counts.addAll(bad_counts);
+		words.addAll(all_items);
+		counts.addAll(all_counts);
 		updateList();
 		return true;
 	}
