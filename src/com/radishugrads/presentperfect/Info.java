@@ -9,11 +9,13 @@ import java.util.HashMap;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.media.MediaPlayer;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
@@ -45,7 +47,7 @@ public class Info extends MotherBrain implements Handler.Callback, MediaPlayer.O
 	TextView time_f;
 	TextView speed_f;
 	Object recording;
-	
+	ProgressDialog ringProgressDialog;
 	ListView listcount;
 	LinearLayout comment_view;
 	boolean wordVisib;
@@ -78,6 +80,8 @@ public class Info extends MotherBrain implements Handler.Callback, MediaPlayer.O
 	boolean over_time;
 	Bundle data;
 	boolean firstTime;
+	String prevAct;
+	boolean speech_done = false;
 	
 	private MediaPlayer mPlayer = null;
 	String filePath = null;
@@ -99,6 +103,7 @@ public class Info extends MotherBrain implements Handler.Callback, MediaPlayer.O
 		target_sec = data.getInt("time_limit") % 60;
 		over_time = data.getBoolean("over_time");
 		wpm = data.getInt("wpm");
+		prevAct = data.getString("prev_activity");
 		good_items = new ArrayList<String>(((HashMap<String, Integer>) data.getSerializable("good")).keySet());
 		good_counts = new ArrayList<Integer>(((HashMap<String, Integer>) data.getSerializable("good")).values());
 		
@@ -109,12 +114,15 @@ public class Info extends MotherBrain implements Handler.Callback, MediaPlayer.O
 		all_counts = new ArrayList<Integer>(((HashMap<String, Integer>) data.getSerializable("all")).values());
 //		
 		words = new ArrayList<String>();
+		words.addAll(all_items);
 		counts = new ArrayList<Integer>();
-		
+		counts.addAll(all_counts);
+		updateList();
 		mediaButton = (ImageView) findViewById(R.id.playrec);
 
 		time_f = (TextView) findViewById(R.id.speechtime);
 		speed_f = (TextView) findViewById(R.id.wordspermin);
+		//launchRingDialog();
 		if (over_time){
 			time_f.setBackgroundColor(Color.parseColor("#D22027"));
 			if (is_timer) {
@@ -126,7 +134,7 @@ public class Info extends MotherBrain implements Handler.Callback, MediaPlayer.O
 		if (!over_time) {
 			time_f.setText(String.format("Speech time: %1$02d:%2$02d", actual_min, actual_sec));
 		}
-		
+//		
 		wordVisib = false;
 		commentVisib = false;
 		notesVisib = false;
@@ -142,13 +150,112 @@ public class Info extends MotherBrain implements Handler.Callback, MediaPlayer.O
 		updateList_comments();
 		File dir = new File(Environment.getExternalStorageDirectory().getPath(), "PresentPerfect");
 		filePath = dir + "/" + getIntent().getStringExtra("rec_name") + ".wav";
-		speechToText();
+//		speechToText();
 		mediaButton.setOnTouchListener(new playbackButtonOnTouchListener(R.drawable.playb,  
 				R.drawable.playb_pressed, 
 				R.drawable.pauseb,
 				R.drawable.pauseb_pressed));
 	}
+	
+	@Override
+	public void onStart(){
+		super.onStart();
+		ringProgressDialog = ProgressDialog.show(this, "Please wait ...",	"Analyzing recording ...", true, true);
+		//ringProgressDialog.setCancelable(true);
+		//launchRingDialog();
+		//ProgressDialog ringProgressDialog = ProgressDialog.show(this, "Please wait ...",	"Analyzing recording ...", true, true);
+		new Thread(new Runnable() {
+			@Override
+			public void run() {
+				try {
+					Log.d("INSIDE: ", "RUNNABLE");
+					// Here you should write your time consuming task...
+					// Let the progress ring for 10 seconds...
+					if (prevAct.equals("RecorderActivity")){
+						speechToText();
+						Log.d("DID ", "SPEECH 2 TEXT");
+						while (!speech_done){
+						}
+					}
+				} catch (Exception e) {
 
+				}
+				ringProgressDialog.dismiss();
+				Log.d("NOW: ", "DONE");
+			}
+		}).start();
+	}
+	
+	public void launchRingDialog() {
+		Log.d("INSIDE: ", "LAUNCH FUNC");
+		ringProgressDialog = ProgressDialog.show(this, "Please wait ...",	"Analyzing recording ...", true, true);
+		ringProgressDialog.setCancelable(true);
+		Log.d("PRE: ", "RUNNABLE");
+		new Thread(new Runnable() {
+			@Override
+			public void run() {
+				try {
+					Log.d("INSIDE: ", "RUNNABLE");
+					// Here you should write your time consuming task...
+					// Let the progress ring for 10 seconds...
+					if (over_time){
+						time_f.setBackgroundColor(Color.parseColor("#D22027"));
+						if (is_timer) {
+							time_f.setText(String.format("%1$02d:%2$02d is up!", target_min, target_sec));
+						} else {
+							time_f.setText(String.format("Speech time: %1$02d:%2$02d", actual_min, actual_sec));
+						}
+					}
+					if (!over_time) {
+						time_f.setText(String.format("Speech time: %1$02d:%2$02d", actual_min, actual_sec));
+					}
+					
+					wordVisib = false;
+					commentVisib = false;
+					notesVisib = false;
+					chosen_contacts = new ArrayList<String>();
+					firstPanel = (LinearLayout) findViewById(R.id.firstPanel);
+					notes = (LinearLayout) findViewById(R.id.thirdPanel);
+					comment_view = (LinearLayout) findViewById(R.id.commentlist);
+					arrow1 = (ImageView) findViewById(R.id.imageView2);
+					arrow2 = (ImageView) findViewById(R.id.imageView3);
+					arrow3 = (ImageView) findViewById(R.id.imageView4);
+					spinner1 = (Spinner) findViewById(R.id.spinner1);
+					spinner1.setOnItemSelectedListener(new SpinnerActivity1());
+					updateList_comments();
+					File dir = new File(Environment.getExternalStorageDirectory().getPath(), "PresentPerfect");
+					filePath = dir + "/" + getIntent().getStringExtra("rec_name") + ".wav";
+					speechToText();
+					mediaButton.setOnTouchListener(new playbackButtonOnTouchListener(R.drawable.playb,  
+							R.drawable.playb_pressed, 
+							R.drawable.pauseb,
+							R.drawable.pauseb_pressed));
+				} catch (Exception e) {
+
+				}
+				ringProgressDialog.dismiss();
+			}
+		}).start();
+	}
+
+//	 AsyncTask fibonacciLoader = new AsyncTask() {
+//
+//			@Override
+//			protected void doInBackground(Void... params) {
+//				generateFibonacciNumber(1, 1);
+//				return null;
+//			}
+//			
+//			@Override
+//			protected void onPostExecute(Void result) {
+//             pd.dismiss();
+//			}
+//     };
+//     
+//     ProgressDialog pd = ProgressDialog.show(this, "Please Wait...", "Loading Fibonacci Numbers 1 through 1,000,000,000!", true, true);
+//     
+//     fibonacciLoader.execute((void[]) null);
+    
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
@@ -478,9 +585,12 @@ public class SpinnerActivity1 extends Activity implements OnItemSelectedListener
 		all_counts = new ArrayList<Integer>();
 		all_counts.addAll(good_counts);
 		all_counts.addAll(bad_counts);
+		words.clear();
+		counts.clear();
 		words.addAll(all_items);
 		counts.addAll(all_counts);
 		updateList();
+		speech_done = true;
 		return true;
 	}
 	

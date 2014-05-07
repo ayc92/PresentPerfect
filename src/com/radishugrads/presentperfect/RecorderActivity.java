@@ -248,7 +248,7 @@ public class RecorderActivity extends MotherBrain {
 		Intent recordIntent = new Intent(context, Info.class);
 		recordIntent.putExtra("recordPath", wavPath);
 		Bundle data = new Bundle();
-		
+		data.putString("prev_activity", "RecorderActivity");
 		data.putString("rec_name", recName);
 		data.putBoolean("is_timer", isTimer);
 		if (!isTimer) {
