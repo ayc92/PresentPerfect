@@ -158,7 +158,7 @@ public class ExpandableListFragment extends TabFragment {
 	            @Override
 	            public boolean onChildClick(ExpandableListView parent, View v,
 	                    int groupPosition, int childPosition, long id) {
-	            	if (removeButtonPushed && childPosition != ADD_CHILD) {
+	            	if (removeButtonPushed) {
 	            		removeInfo[0] = groupPosition;
 	            		removeInfo[1] = childPosition;
 	            		AlertDialog.Builder alert = createChildDeleteDialog(groupPosition, childPosition);
@@ -193,7 +193,7 @@ public class ExpandableListFragment extends TabFragment {
 	            			data.putString("rec_name", ((TextView) v.findViewById(R.id.lblListItem)).getText().toString());
 	            			
 	            			i.putExtras(data);
-	            			startActivity(i);
+	            			//startActivity(i);
 	            	}
 	                return false;
 	            }
